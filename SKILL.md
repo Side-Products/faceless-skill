@@ -47,6 +47,7 @@ If npm is unavailable, fall back to the raw HTTP API (see the last section).
 | `faceless videos list` | List the team's videos | GET /videos |
 | `faceless videos get` | Get one video | GET /videos/{id} |
 | `faceless videos update` | Update a video's name or post metadata | PATCH /videos/{id} |
+| `faceless videos select-thumbnail` | Choose which thumbnail a video uses | POST /videos/{id}/thumbnail |
 | `faceless videos status` | Poll video generation progress | GET /videos/{id}/status |
 | `faceless videos render` | Render a video to MP4 | POST /videos/{id}/render |
 | `faceless videos delete` | Delete a video | DELETE /videos/{id} |

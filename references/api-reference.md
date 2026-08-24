@@ -284,6 +284,24 @@ Response:
     "voiceId": "EXAVITQu4vr4xnSDxMaL",
     "status": "completed",
     "renderedVideoUrl": "https://exports.faceless.so/renders/665f1b2a9c31a2b3c4d5e801/1722333444555.mp4",
+    "thumbnailUrl": "https://exports.faceless.so/thumbnails/665f1b2a9c31a2b3c4d5e801/1/a1b2c3d4.jpg",
+    "thumbnails": {
+      "status": "ready",
+      "generation": 1,
+      "aspect": "9:16",
+      "selectedVariantId": "a1b2c3d4-0000-4000-8000-000000000001",
+      "selectedBy": "ai",
+      "variants": [
+        {
+          "id": "a1b2c3d4-0000-4000-8000-000000000001",
+          "url": "https://exports.faceless.so/thumbnails/665f1b2a9c31a2b3c4d5e801/1/a1b2c3d4.jpg",
+          "hookText": "OCEAN RIVERS",
+          "source": "ai",
+          "score": 88,
+          "grade": "S"
+        }
+      ]
+    },
     "createdAt": "2026-07-30T10:00:00.000Z"
   }
 }
@@ -332,6 +350,56 @@ Response:
     "name": "Ocean facts",
     "youtubePost": {
       "title": "The ocean has rivers underwater"
+    },
+    "thumbnailUrl": "https://exports.faceless.so/thumbnails/665f1b2a9c31a2b3c4d5e801/1/a1b2c3d4.jpg",
+    "thumbnails": {
+      "status": "ready",
+      "selectedBy": "ai",
+      "variants": []
+    }
+  }
+}
+```
+
+### Choose which thumbnail a video uses
+
+`POST /videos/{id}/thumbnail`
+
+Selects one of the video's thumbnail variants as the effective thumbnail. Read the available variants from GET /videos/{id} (the thumbnails object). The choice is marked as a user pick, so later automatic regenerations will not overwrite it, and it is what gets pushed to YouTube and used as the Instagram Reels cover at post time. Thumbnails are free and generated automatically after a video completes.
+
+- Scopes: `videos:write`
+- Credits: none
+- CLI: `faceless videos select-thumbnail`
+- MCP tool: `faceless_select_video_thumbnail`
+
+Body fields:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `variantId` | string | yes | Variant id from the thumbnails.variants array on GET /videos/{id} |
+
+Example:
+
+```bash
+curl -s -X POST "https://faceless.so/api/v1/videos/<id>/thumbnail" \
+  -H "Authorization: Bearer $FACELESS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"variantId":"a1b2c3d4-0000-4000-8000-000000000002"}'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "665f1b2a9c31a2b3c4d5e801",
+    "thumbnailUrl": "https://exports.faceless.so/thumbnails/665f1b2a9c31a2b3c4d5e801/1/b2c3d4e5.jpg",
+    "thumbnails": {
+      "status": "ready",
+      "selectedVariantId": "a1b2c3d4-0000-4000-8000-000000000002",
+      "selectedBy": "user",
+      "variants": []
     }
   }
 }
@@ -505,6 +573,8 @@ Body fields:
 | `duration` | `30` \| `60` \| `90` | no | Target episode length in seconds (30, 60 or 90) |
 | `destination` | string | no | Primary auto-post destination platform, e.g. youtube or tiktok |
 | `destinationAccounts` | array | no | Connected account ids to auto-post to (from GET /accounts) |
+| `generateThumbnails` | boolean | no | Generate 3 AI thumbnail variants for every episode and auto-select the best. Free. Defaults to true. |
+| `thumbnailSettings` | object | no | Thumbnail generation options. Ignored when generateThumbnails is false. |
 | `autoPostTime` | string | no | Daily auto-post time "HH:mm" in the series timezone |
 | `postingDays` | array | no | Days of the week to post, e.g. ["Monday","Wednesday"]. Omit for every day |
 | `timezone` | string | no | IANA timezone for scheduling, e.g. America/New_York |
@@ -640,6 +710,8 @@ Body fields:
 | `duration` | `30` \| `60` \| `90` | no | Target episode length in seconds (30, 60 or 90) |
 | `destination` | string | no | Primary auto-post destination platform, e.g. youtube or tiktok |
 | `destinationAccounts` | array | no | Connected account ids to auto-post to (from GET /accounts) |
+| `generateThumbnails` | boolean | no | Generate 3 AI thumbnail variants for every episode and auto-select the best. Free. Defaults to true. |
+| `thumbnailSettings` | object | no | Thumbnail generation options. Ignored when generateThumbnails is false. |
 | `autoPostTime` | string | no | Daily auto-post time "HH:mm" in the series timezone |
 | `postingDays` | array | no | Days of the week to post, e.g. ["Monday","Wednesday"]. Omit for every day |
 | `timezone` | string | no | IANA timezone for scheduling, e.g. America/New_York |
