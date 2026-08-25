@@ -240,7 +240,7 @@ Response:
       "name": "Ocean facts",
       "platform": "tts",
       "model": "storyboard",
-      "renderedVideoUrl": null,
+      "renderedVideoUrl": "https://exports.faceless.so/renders/665f1b2a9c31a2b3c4d5e801/1730000000000.mp4",
       "createdAt": "2026-07-30T10:00:00.000Z"
     }
   ],
@@ -355,7 +355,9 @@ Response:
     "thumbnails": {
       "status": "ready",
       "selectedBy": "ai",
-      "variants": []
+      "variants": [
+        "https://exports.faceless.so/thumbnails/665f1b2a9c31a2b3c4d5e801/a.jpg"
+      ]
     }
   }
 }
@@ -399,7 +401,9 @@ Response:
       "status": "ready",
       "selectedVariantId": "a1b2c3d4-0000-4000-8000-000000000002",
       "selectedBy": "user",
-      "variants": []
+      "variants": [
+        "https://exports.faceless.so/thumbnails/665f1b2a9c31a2b3c4d5e801/a.jpg"
+      ]
     }
   }
 }
@@ -434,8 +438,10 @@ Response:
     "status": "processing",
     "percentCompleted": 62,
     "readyForEditing": false,
-    "errorMessages": [],
-    "renderedVideoUrl": null
+    "errorMessages": [
+      "b-roll fetch timed out, retried"
+    ],
+    "renderedVideoUrl": "https://exports.faceless.so/renders/665f1b2a9c31a2b3c4d5e801/1730000000000.mp4"
   }
 }
 ```
@@ -1058,8 +1064,20 @@ Response:
         "channelName": "Deep Sea Facts"
       }
     ],
-    "tiktok": [],
-    "instagram": []
+    "tiktok": [
+      {
+        "id": "665f1b2a9c31a2b3c4d5e901",
+        "username": "mychannel",
+        "status": "connected"
+      }
+    ],
+    "instagram": [
+      {
+        "id": "665f1b2a9c31a2b3c4d5e902",
+        "username": "mychannel",
+        "status": "connected"
+      }
+    ]
   }
 }
 ```
