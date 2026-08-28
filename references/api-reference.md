@@ -1088,7 +1088,7 @@ Response:
 
 `GET /voices`
 
-Returns the text-to-speech voices available for narration, including the team's custom cloned voices. Use a voice's id as voiceId in createVideo or voice in createSeries.
+Returns the text-to-speech voices available for narration, including the team's custom cloned voices and Recommended Studio Quality voices. Recommended ids are opaque: pass the returned id unchanged and Faceless will resolve the appropriate ElevenLabs model. Use a voice's id as voiceId in createVideo or voice in createSeries.
 
 - Scopes: `catalog:read`
 - Credits: none
@@ -1109,10 +1109,22 @@ Response:
   "success": true,
   "data": [
     {
-      "id": "EXAVITQu4vr4xnSDxMaL",
-      "name": "Sarah",
+      "id": "eleven_quality:EXAVITQu4vr4xnSDxMaL",
+      "baseVoiceId": "EXAVITQu4vr4xnSDxMaL",
+      "name": "Sarah - Studio Quality",
       "previewUrl": "https://storage.googleapis.com/eleven-public-prod/premade/voices/EXAVITQu4vr4xnSDxMaL.mp3",
-      "isCustom": false
+      "labels": {
+        "language": "en",
+        "gender": "female",
+        "accent": "american"
+      },
+      "isCustom": false,
+      "isRecommended": true,
+      "qualityTier": "studio",
+      "modelPolicy": "quality_auto",
+      "targetLanguages": [
+        "en"
+      ]
     }
   ]
 }
