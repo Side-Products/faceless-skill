@@ -35,19 +35,16 @@ Response:
   "success": true,
   "data": {
     "team": {
-      "id": "665f1b2a9c31a2b3c4d5e601",
       "name": "My Channel",
       "credits": 340
     },
     "plan": "creator",
     "auth": {
       "via": "api_key",
-      "keyPrefix": "fl_live_a1b2c3d4",
       "scopes": [
         "videos:read",
         "videos:write"
-      ],
-      "legacy": false
+      ]
     }
   }
 }
@@ -89,7 +86,6 @@ Response:
     "balance": 340,
     "history": [
       {
-        "id": "665f1b2a9c31a2b3c4d5e701",
         "credits": -50,
         "type": "spending",
         "description": "Faceless video (motion_lite)",
@@ -1060,22 +1056,23 @@ Response:
   "data": {
     "youtube": [
       {
-        "id": "665f1b2a9c31a2b3c4d5ee01",
-        "channelName": "Deep Sea Facts"
+        "authId": "665f1b2a9c31a2b3c4d5ee01",
+        "label": "Deep Sea Facts",
+        "isDefault": true
       }
     ],
     "tiktok": [
       {
-        "id": "665f1b2a9c31a2b3c4d5e901",
-        "username": "mychannel",
-        "status": "connected"
+        "authId": "665f1b2a9c31a2b3c4d5e901",
+        "label": "mychannel",
+        "isDefault": true
       }
     ],
     "instagram": [
       {
-        "id": "665f1b2a9c31a2b3c4d5e902",
-        "username": "mychannel",
-        "status": "connected"
+        "authId": "665f1b2a9c31a2b3c4d5e902",
+        "label": "mychannel",
+        "isDefault": false
       }
     ]
   }
@@ -1237,7 +1234,7 @@ Query parameters:
 | --- | --- | --- | --- |
 | `platform` | `youtube` \| `tiktok` \| `instagram` \| `facebook` | no | Filter to one platform |
 | `authId` | string | no | Filter to one connected account |
-| `range` | integer | no | Trailing window in days (default 30) |
+| `range` | mixed | no | Trailing analytics window: 7, 28, or 90 days (default 28) |
 
 Example:
 
@@ -1252,17 +1249,45 @@ Response:
 {
   "success": true,
   "data": {
-    "totals": {
-      "posts": 42,
-      "views": 128530,
-      "likes": 9210
+    "rangeDays": 28,
+    "rollup": {
+      "rangeDays": 28,
+      "viewsGained": 12500,
+      "totalViews": 128530,
+      "postsSynced": 42,
+      "ready": true
     },
-    "platforms": {
-      "youtube": {
-        "posts": 20,
-        "views": 88000
+    "windows": {
+      "d7": {
+        "viewsGained": 3200,
+        "ready": true
+      },
+      "d28": {
+        "viewsGained": 12500,
+        "ready": true
       }
-    }
+    },
+    "byPlatform": {
+      "youtube": {
+        "totalViews": 88000,
+        "postsSynced": 20,
+        "viewsGained28d": 9400
+      }
+    },
+    "topPosts": [
+      {
+        "platform": "youtube",
+        "title": "Deep sea rivers",
+        "views": 42000,
+        "postUrl": "https://youtube.com/shorts/example"
+      }
+    ],
+    "totals": {
+      "totalViews": 128530,
+      "postsSynced": 42,
+      "posts7d": 7
+    },
+    "timeseriesReady": true
   }
 }
 ```
