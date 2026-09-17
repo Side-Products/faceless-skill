@@ -578,7 +578,7 @@ Body fields:
 | `generateThumbnails` | boolean | no | Generate 3 AI thumbnail variants for every episode and auto-select the best. Free. Defaults to true. |
 | `thumbnailSettings` | object | no | Thumbnail generation options. Ignored when generateThumbnails is false. |
 | `autoPostTime` | string | no | Daily auto-post time "HH:mm" in the series timezone |
-| `postingDays` | array | no | Days of the week to post, e.g. ["Monday","Wednesday"]. Omit for every day |
+| `postingDays` | array | no | Days of the week to post as numbers, 0 is Sunday and 6 is Saturday, e.g. [1,3] for Monday and Wednesday. Omit for every day |
 | `timezone` | string | no | IANA timezone for scheduling, e.g. America/New_York |
 | `captionStyle` | string | no | Caption theme name. Full list: GET /options?kind=captionThemes |
 | `subreddit` | string | no | Subreddit to pull posts from when source is "Reddit post" |
@@ -715,7 +715,7 @@ Body fields:
 | `generateThumbnails` | boolean | no | Generate 3 AI thumbnail variants for every episode and auto-select the best. Free. Defaults to true. |
 | `thumbnailSettings` | object | no | Thumbnail generation options. Ignored when generateThumbnails is false. |
 | `autoPostTime` | string | no | Daily auto-post time "HH:mm" in the series timezone |
-| `postingDays` | array | no | Days of the week to post, e.g. ["Monday","Wednesday"]. Omit for every day |
+| `postingDays` | array | no | Days of the week to post as numbers, 0 is Sunday and 6 is Saturday, e.g. [1,3] for Monday and Wednesday. Omit for every day |
 | `timezone` | string | no | IANA timezone for scheduling, e.g. America/New_York |
 | `captionStyle` | string | no | Caption theme name. Full list: GET /options?kind=captionThemes |
 | `subreddit` | string | no | Subreddit to pull posts from when source is "Reddit post" |
