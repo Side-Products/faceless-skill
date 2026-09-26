@@ -6,7 +6,7 @@ Base URL: `https://faceless.so/api/v1`
 
 Authentication: `Authorization: Bearer fl_live_...` (or `X-API-Key`). Create keys at https://faceless.so/developers.
 
-Envelope: success responses are `{ "success": true, "data": ..., "pagination"?: { page, limit, total } }`. Errors are `{ "success": false, "error": { "type", "message" } }` with types: `invalid_input`, `unauthorized`, `forbidden_scope`, `not_found`, `conflict`, `insufficient_credits`, `usage_limit_reached`, `rate_limited`, `internal_error`.
+Envelope: success responses are `{ "success": true, "data": ..., "pagination"?: { page, limit, total } }`. Errors are `{ "success": false, "error": { "type", "message" } }` with types: `invalid_input`, `unauthorized`, `forbidden_scope`, `not_found`, `conflict`, `insufficient_credits`, `payment_failed`, `usage_limit_reached`, `rate_limited`, `internal_error`.
 
 ## me
 
@@ -97,6 +97,49 @@ Response:
     "page": 1,
     "limit": 20,
     "total": 1
+  }
+}
+```
+
+### Buy a credit pack with an agent payment token
+
+`POST /credits`
+
+Buys a credit pack and adds the credits to the team immediately, paid with a Stripe Shared Payment Token (spt_...) that the customer approved in their Link agent wallet. Packs: pack_10 ($10, 100 credits), pack_25 ($25, 275), pack_50 ($50, 600); active subscribers get more credits per pack at their plan rate. Request the token for the Faceless.so Stripe profile (profile_61UDMKC11wsLfeXaMA6UDMKCL0SQKAF3aHKCFz33IPL6) with a USD max_amount of at least the pack price. Tokens are single use: retrying with the same token never charges twice. A declined, expired or already used token returns 402 payment_failed.
+
+- Scopes: `credits:write`
+- Credits: none (adds credits; charges the payment token the pack price in USD)
+- Rate limit: 5 per 60s
+- Supports `Idempotency-Key` header
+- CLI: `faceless buy-credits`
+
+Body fields:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `packId` | `pack_10` \| `pack_25` \| `pack_50` | yes | Credit pack to buy: pack_10 ($10), pack_25 ($25) or pack_50 ($50) |
+| `paymentToken` | string | yes | Stripe Shared Payment Token granted to Faceless.so by the customer's agent wallet |
+
+Example:
+
+```bash
+curl -s -X POST "https://faceless.so/api/v1/credits" \
+  -H "Authorization: Bearer $FACELESS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"packId":"pack_10","paymentToken":"spt_1Rx2abc"}'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "packId": "pack_10",
+    "amountUsd": 10,
+    "creditsAdded": 100,
+    "balance": 440,
+    "paymentIntentId": "pi_3Rx2abc"
   }
 }
 ```

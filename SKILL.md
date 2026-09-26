@@ -42,6 +42,7 @@ If npm is unavailable, fall back to the raw HTTP API (see the last section).
 | --- | --- | --- |
 | `faceless whoami` | Identify the caller | GET /me |
 | `faceless credits` | Credit balance and history | GET /credits |
+| `faceless buy-credits` | Buy a credit pack with an agent payment token | POST /credits |
 | `faceless videos create` | Create a faceless video from a script | POST /videos |
 | `faceless videos captions` | Caption an existing video or audio file | POST /videos/captions |
 | `faceless videos list` | List the team's videos | GET /videos |
