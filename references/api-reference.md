@@ -1334,3 +1334,251 @@ Response:
   }
 }
 ```
+
+## ads
+
+### Search Meta ads shown in the EU and UK
+
+`GET /ads/search`
+
+Searches the official Meta Ad Library by keywords in the ad text or by one advertiser's exact Facebook Page ID. Meta only returns commercial ads delivered in the EU and UK, so the country is one of those or EU_UK for all of them. Returns up to 25 ads (copy variants, delivery dates, platforms, a public Meta link), a resultToken to save or brief any of them within 15 minutes, and an opaque nextCursor. Free; each team has a daily search allowance and cached repeats do not count against it. No media files are returned.
+
+- Scopes: `ads:read`
+- Credits: none
+- Rate limit: 10 per 60s
+- CLI: `faceless ads search`
+
+Query parameters:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `q` | string | no | Words in the ad text. Send q or pageId, not both. |
+| `pageId` | string | no | One advertiser's exact Facebook Page ID (from its Ad Library link, view_all_page_id). |
+| `country` | `EU_UK` \| `AT` \| `BE` \| `BG` \| `HR` \| `CY` \| `CZ` \| `DK` \| `EE` \| `FI` \| `FR` \| `DE` \| `GR` \| `HU` \| `IE` \| `IT` \| `LV` \| `LT` \| `LU` \| `MT` \| `NL` \| `PL` \| `PT` \| `RO` \| `SK` \| `SI` \| `ES` \| `SE` \| `GB` | no | Where the ad was shown |
+| `mediaType` | `ALL` \| `IMAGE` \| `VIDEO` | no |  |
+| `platform` | `ALL` \| `FACEBOOK` \| `INSTAGRAM` \| `MESSENGER` \| `AUDIENCE_NETWORK` \| `THREADS` \| `WHATSAPP` | no |  |
+| `status` | `ACTIVE` \| `INACTIVE` \| `ALL` | no | ACTIVE: running now |
+| `cursor` | string | no | nextCursor from the previous page of the same search; keep every other parameter unchanged. |
+
+Example:
+
+```bash
+curl -s "https://faceless.so/api/v1/ads/search" \
+  -H "Authorization: Bearer $FACELESS_API_KEY"
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "adId": "2716161098763684",
+        "pageId": "123456789",
+        "pageName": "Example brand",
+        "bodies": [
+          "Turn one idea into a week of videos."
+        ],
+        "titles": [
+          "Videos on autopilot"
+        ],
+        "captions": [],
+        "descriptions": [],
+        "startedAt": "2026-08-01T00:00:00.000Z",
+        "stoppedAt": null,
+        "platforms": [
+          "FACEBOOK",
+          "INSTAGRAM"
+        ],
+        "mediaType": null,
+        "observedStatus": "ACTIVE",
+        "sourceUrl": "https://www.facebook.com/ads/library/?id=2716161098763684",
+        "fetchedAt": "2026-09-26T10:00:00.000Z",
+        "savedId": null
+      }
+    ],
+    "resultToken": "22df1b25-533f-4bd7-862a-aedc4a4ea0cc",
+    "expiresAt": "2026-09-26T10:15:00.000Z",
+    "nextCursor": "0b6f3c1e-8f4a-4c55-9e0b-7d2a1c9e4f10"
+  }
+}
+```
+
+### List the team's saved ads
+
+`GET /saved-ads`
+
+Returns the ads the team saved from Meta Ad Library searches, newest first, 24 per page, with each ad's details as Meta showed them when it was saved. Filter by one advertiser with pageId. Works even when fresh search is paused.
+
+- Scopes: `ads:read`
+- Credits: none
+- CLI: `faceless ads saved`
+
+Query parameters:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `pageId` | string | no | Only this advertiser's ads |
+| `page` | integer | no |  |
+
+Example:
+
+```bash
+curl -s "https://faceless.so/api/v1/saved-ads" \
+  -H "Authorization: Bearer $FACELESS_API_KEY"
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "665f1b2a9c31a2b3c4d5f001",
+        "ad": {
+          "adId": "2716161098763684",
+          "pageName": "Example brand"
+        },
+        "savedAt": "2026-09-26T10:01:00.000Z"
+      }
+    ],
+    "advertisers": [
+      {
+        "pageId": "123456789",
+        "pageName": "Example brand"
+      }
+    ],
+    "savedCount": 1,
+    "savedLimit": 500,
+    "page": 1,
+    "pages": 1
+  }
+}
+```
+
+### Save an ad from a search
+
+`POST /saved-ads`
+
+Saves one ad from a searchAds result to the team's saved ads, using that search's resultToken (valid 15 minutes; search again after that). Saving the same ad twice returns the first save. A team can keep 500 saved ads.
+
+- Scopes: `ads:write`
+- Credits: none
+- CLI: `faceless ads save`
+
+Body fields:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `adId` | string | yes | adId from searchAds |
+| `resultToken` | string | yes | resultToken of the search page that returned the ad |
+
+Example:
+
+```bash
+curl -s -X POST "https://faceless.so/api/v1/saved-ads" \
+  -H "Authorization: Bearer $FACELESS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"adId":"2716161098763684","resultToken":"22df1b25-533f-4bd7-862a-aedc4a4ea0cc"}'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "665f1b2a9c31a2b3c4d5f001",
+    "ad": {
+      "adId": "2716161098763684",
+      "pageName": "Example brand"
+    },
+    "savedAt": "2026-09-26T10:01:00.000Z"
+  }
+}
+```
+
+### Remove a saved ad
+
+`DELETE /saved-ads/{id}`
+
+Removes one of the team's saved ads. An id the team does not have answers 404.
+
+- Scopes: `ads:write`
+- Credits: none
+- CLI: `faceless ads unsave`
+
+Example:
+
+```bash
+curl -s -X DELETE "https://faceless.so/api/v1/saved-ads/<id>" \
+  -H "Authorization: Bearer $FACELESS_API_KEY"
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "deleted": true
+  }
+}
+```
+
+### Write an ad brief for your brand from a competitor's ad
+
+`POST /ads/briefs`
+
+Writes an original ad brief (hook, promise, script, visual direction, call to action) for the team's brand, inspired by one ad from searchAds or the saved ads. Only the ad's approach carries over: every claim comes from the brand description you send, and the advertiser's name, offers, prices and results never appear. target sizes the script: motion (20 s motion-graphics ad), product-video (30 s narrated video), ugc (20 s creator talking to camera) or image (one static ad). Free; use the brief with createVideo or any other operation. 30 briefs per hour.
+
+- Scopes: `ads:write`
+- Credits: none
+- Rate limit: 30 per 3600s
+- CLI: `faceless ads brief`
+
+Body fields:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `adId` | string | yes |  |
+| `resultToken` | string | no | From searchAds; send this or savedId |
+| `savedId` | string | no | A saved ad's id; send this or resultToken |
+| `target` | `motion` \| `product-video` \| `ugc` \| `image` | yes | What the brief is for |
+| `brand` | object | yes | Your brand |
+| `notes` | string | no | A real offer, a feature to lead with, a tone |
+
+Example:
+
+```bash
+curl -s -X POST "https://faceless.so/api/v1/ads/briefs" \
+  -H "Authorization: Bearer $FACELESS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"adId":"2716161098763684","resultToken":"22df1b25-533f-4bd7-862a-aedc4a4ea0cc","target":"product-video","brand":{"name":"Acme Coffee","description":"Small-batch coffee beans roasted to order and shipped within two days."}}'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "brief": {
+      "hook": "Your coffee was roasted months ago",
+      "benefit": "Beans roasted the day you order them, at your door two days later.",
+      "script": "Your coffee was roasted months ago. Ours is roasted when you order. It reaches you two days later. Taste the difference.",
+      "visualDirection": "Close-ups of beans leaving the roaster, a kraft bag being sealed, a morning pour.",
+      "cta": "Order a fresh bag"
+    },
+    "source": {
+      "adId": "2716161098763684",
+      "pageName": "Example brand",
+      "sourceUrl": "https://www.facebook.com/ads/library/?id=2716161098763684"
+    }
+  }
+}
+```

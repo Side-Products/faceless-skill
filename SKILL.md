@@ -69,6 +69,11 @@ If npm is unavailable, fall back to the raw HTTP API (see the last section).
 | `faceless options` | List content option catalogs | GET /options |
 | `faceless assets create` | Register a media asset by URL | POST /assets |
 | `faceless analytics` | Cross-platform posting analytics | GET /analytics |
+| `faceless ads search` | Search Meta ads shown in the EU and UK | GET /ads/search |
+| `faceless ads saved` | List the team's saved ads | GET /saved-ads |
+| `faceless ads save` | Save an ad from a search | POST /saved-ads |
+| `faceless ads unsave` | Remove a saved ad | DELETE /saved-ads/{id} |
+| `faceless ads brief` | Write an ad brief for your brand from a competitor's ad | POST /ads/briefs |
 
 Full flag-level detail: references/api-reference.md (or https://faceless.so/llms-full.txt).
 
