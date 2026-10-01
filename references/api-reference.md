@@ -112,6 +112,7 @@ Buys a credit pack and adds the credits to the team immediately, paid with a Str
 - Rate limit: 5 per 60s
 - Supports `Idempotency-Key` header
 - CLI: `faceless buy-credits`
+- MCP tool: `faceless_buy_credits`
 
 Body fields:
 
