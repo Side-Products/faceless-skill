@@ -631,6 +631,7 @@ Body fields:
 | `brollModel` | string | no | Generation model for visuals: storyboard, motion_lite or motion_pro |
 | `showEmojis` | boolean | no | Overlay emojis on captions |
 | `enableBackgroundMusic` | boolean | no | Mix background music under the narration |
+| `enableVoiceover` | boolean | no | Story Slides and News Slides only: an AI voice reads each slide, using `voice` (a default voice when omitted). Defaults to false (music only) |
 | `backgroundMusicMood` | string | no | Background music mood. Full list: GET /options?kind=music |
 | `hashtags` | string | no | Hashtags appended to post captions |
 | `tone` | string | no | Writing tone for generated scripts |
@@ -768,6 +769,7 @@ Body fields:
 | `brollModel` | string | no | Generation model for visuals: storyboard, motion_lite or motion_pro |
 | `showEmojis` | boolean | no | Overlay emojis on captions |
 | `enableBackgroundMusic` | boolean | no | Mix background music under the narration |
+| `enableVoiceover` | boolean | no | Story Slides and News Slides only: an AI voice reads each slide, using `voice` (a default voice when omitted). Defaults to false (music only) |
 | `backgroundMusicMood` | string | no | Background music mood. Full list: GET /options?kind=music |
 | `hashtags` | string | no | Hashtags appended to post captions |
 | `tone` | string | no | Writing tone for generated scripts |
