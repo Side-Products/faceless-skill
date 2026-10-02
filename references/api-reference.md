@@ -624,6 +624,7 @@ Body fields:
 | `autoPostTime` | string | no | Daily auto-post time "HH:mm" in the series timezone |
 | `postingDays` | array | no | Days of the week to post as numbers, 0 is Sunday and 6 is Saturday, e.g. [1,3] for Monday and Wednesday. Omit for every day |
 | `timezone` | string | no | IANA timezone for scheduling, e.g. America/New_York |
+| `platformPostTimes` | object | no | Post one platform at a different time of day, in the series timezone and on the same posting days, e.g. {"youtube":"09:05"}. Useful because YouTube's shared daily upload limit resets at midnight US Pacific. null clears it |
 | `captionStyle` | string | no | Caption theme name. Full list: GET /options?kind=captionThemes |
 | `subreddit` | string | no | Subreddit to pull posts from when source is "Reddit post" |
 | `backgroundVideo` | string | no | Background gameplay/footage id. Full list: GET /options?kind=backgrounds |
@@ -762,6 +763,7 @@ Body fields:
 | `autoPostTime` | string | no | Daily auto-post time "HH:mm" in the series timezone |
 | `postingDays` | array | no | Days of the week to post as numbers, 0 is Sunday and 6 is Saturday, e.g. [1,3] for Monday and Wednesday. Omit for every day |
 | `timezone` | string | no | IANA timezone for scheduling, e.g. America/New_York |
+| `platformPostTimes` | object | no | Post one platform at a different time of day, in the series timezone and on the same posting days, e.g. {"youtube":"09:05"}. Useful because YouTube's shared daily upload limit resets at midnight US Pacific. null clears it |
 | `captionStyle` | string | no | Caption theme name. Full list: GET /options?kind=captionThemes |
 | `subreddit` | string | no | Subreddit to pull posts from when source is "Reddit post" |
 | `backgroundVideo` | string | no | Background gameplay/footage id. Full list: GET /options?kind=backgrounds |
