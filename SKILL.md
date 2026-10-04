@@ -62,6 +62,7 @@ If npm is unavailable, fall back to the raw HTTP API (see the last section).
 | `faceless series episodes` | List a series' episodes | GET /series/{id}/episodes |
 | `faceless posts publish` | Publish a rendered video to a platform now | POST /posts |
 | `faceless posts schedule` | Schedule a video to one or more platforms | POST /posts/schedule |
+| `faceless posts now` | Post a scheduled video now instead of at its scheduled time | POST /posts/post-now |
 | `faceless posts cancel` | Cancel a scheduled post | DELETE /posts/{id} |
 | `faceless calendar` | Posting calendar | GET /calendar |
 | `faceless accounts` | List connected social accounts | GET /accounts |

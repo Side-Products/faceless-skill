@@ -1003,6 +1003,50 @@ Response:
 }
 ```
 
+### Post a scheduled video now instead of at its scheduled time
+
+`POST /posts/post-now`
+
+Brings a scheduled video forward to now: every pending posting task of the video (and its render, if that is what is still waiting) moves to the current time and goes out within a minute or two, to every platform it was scheduled for. Works for videos scheduled with POST /posts/schedule and for series episodes waiting for their slot. It does not post a video that was never scheduled (use POST /posts), a video that still needs approval (409; approve it first), or an episode of a paused series (409; resume the series first). Returns 400 when nothing is pending.
+
+- Scopes: `posts:write`
+- Credits: none
+- Rate limit: 20 per 300s
+- Supports `Idempotency-Key` header
+- CLI: `faceless posts now`
+- MCP tool: `faceless_post_now`
+
+Body fields:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `videoId` | string | yes | The scheduled video (project) to post now |
+
+Example:
+
+```bash
+curl -s -X POST "https://faceless.so/api/v1/posts/post-now" \
+  -H "Authorization: Bearer $FACELESS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"videoId":"665f1b2a9c31a2b3c4d5e801"}'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "videoId": "665f1b2a9c31a2b3c4d5e801",
+    "taskIds": [
+      "665f1b2a9c31a2b3c4d5ec01",
+      "665f1b2a9c31a2b3c4d5ec02"
+    ],
+    "scheduledTime": "2026-10-03T21:04:11.000Z"
+  }
+}
+```
+
 ### Cancel a scheduled post
 
 `DELETE /posts/{id}`
