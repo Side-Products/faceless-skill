@@ -618,7 +618,7 @@ Body fields:
 | `language` | string | no | Video language, e.g. English. Full list: GET /options?kind=languages |
 | `duration` | `30` \| `60` \| `90` | no | Target episode length in seconds (30, 60 or 90) |
 | `destination` | string | no | Primary auto-post destination platform, e.g. youtube or tiktok |
-| `destinationAccounts` | array | no | Connected account ids to auto-post to (from GET /accounts) |
+| `destinationAccounts` | mixed | no | Which connected account each platform posts through, by platform, e.g. {"youtube":["<authId>"],"tiktok":["<authId>"]} with authIds from GET /accounts. Every id must be an account of this team on that platform, or the request is rejected. A platform with no entry posts through the team's default account. On update only the platforms you send change; null clears every pin |
 | `generateThumbnails` | boolean | no | Generate 3 AI thumbnail variants for every episode and auto-select the best. Free. Defaults to true. |
 | `thumbnailSettings` | object | no | Thumbnail generation options. Ignored when generateThumbnails is false. |
 | `autoPostTime` | string | no | Daily auto-post time "HH:mm" in the series timezone |
@@ -727,6 +727,14 @@ Response:
     "source": "Facts & stories",
     "niche": "Ocean facts",
     "voice": "EXAVITQu4vr4xnSDxMaL",
+    "destination": [
+      "youtube"
+    ],
+    "destinationAccounts": {
+      "youtube": [
+        "665f1b2a9c31a2b3c4d5ee01"
+      ]
+    },
     "autoPostTime": "18:00",
     "paused": false
   }
@@ -737,7 +745,7 @@ Response:
 
 `PATCH /series/{id}`
 
-Updates any subset of a series' configuration (niche, voice, schedule, destinations, pause state and so on). Only the fields you send change.
+Updates any subset of a series' configuration (niche, voice, schedule, destinations, pause state and so on). Only the fields you send change; in destinationAccounts only the platforms you send change.
 
 - Scopes: `series:write`
 - Credits: none
@@ -757,7 +765,7 @@ Body fields:
 | `language` | string | no | Video language, e.g. English. Full list: GET /options?kind=languages |
 | `duration` | `30` \| `60` \| `90` | no | Target episode length in seconds (30, 60 or 90) |
 | `destination` | string | no | Primary auto-post destination platform, e.g. youtube or tiktok |
-| `destinationAccounts` | array | no | Connected account ids to auto-post to (from GET /accounts) |
+| `destinationAccounts` | mixed | no | Which connected account each platform posts through, by platform, e.g. {"youtube":["<authId>"],"tiktok":["<authId>"]} with authIds from GET /accounts. Every id must be an account of this team on that platform, or the request is rejected. A platform with no entry posts through the team's default account. On update only the platforms you send change; null clears every pin |
 | `generateThumbnails` | boolean | no | Generate 3 AI thumbnail variants for every episode and auto-select the best. Free. Defaults to true. |
 | `thumbnailSettings` | object | no | Thumbnail generation options. Ignored when generateThumbnails is false. |
 | `autoPostTime` | string | no | Daily auto-post time "HH:mm" in the series timezone |
@@ -785,7 +793,7 @@ Example:
 curl -s -X PATCH "https://faceless.so/api/v1/series/<id>" \
   -H "Authorization: Bearer $FACELESS_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"autoPostTime":"09:00","paused":false}'
+  -d '{"autoPostTime":"09:00","paused":false,"destinationAccounts":{"youtube":["665f1b2a9c31a2b3c4d5ee01"]}}'
 ```
 
 Response:
