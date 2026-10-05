@@ -615,7 +615,7 @@ Body fields:
 | `customPrompt` | string | no | Custom topic prompt used instead of (or alongside) a niche |
 | `voice` | string | no | TTS voice id for narration. Full list: GET /voices |
 | `style` | string | no | Visual style for generated imagery. Full list: GET /options?kind=styles |
-| `language` | string | no | Video language, e.g. English. Full list: GET /options?kind=languages |
+| `language` | string | no | Video language, e.g. English. Omitted on create, it is the voice's own language when the voice is made for one language (a Spanish voice gives Spanish), else English. Full list: GET /options?kind=languages |
 | `duration` | `30` \| `60` \| `90` | no | Target episode length in seconds (30, 60 or 90) |
 | `destination` | string | no | Primary auto-post destination platform, e.g. youtube or tiktok |
 | `destinationAccounts` | mixed | no | Which connected account each platform posts through, by platform, e.g. {"youtube":["<authId>"],"tiktok":["<authId>"]} with authIds from GET /accounts. Every id must be an account of this team on that platform, or the request is rejected. A platform with no entry posts through the team's default account. On update only the platforms you send change; null clears every pin |
@@ -762,7 +762,7 @@ Body fields:
 | `customPrompt` | string | no | Custom topic prompt used instead of (or alongside) a niche |
 | `voice` | string | no | TTS voice id for narration. Full list: GET /voices |
 | `style` | string | no | Visual style for generated imagery. Full list: GET /options?kind=styles |
-| `language` | string | no | Video language, e.g. English. Full list: GET /options?kind=languages |
+| `language` | string | no | Video language, e.g. English. Omitted on create, it is the voice's own language when the voice is made for one language (a Spanish voice gives Spanish), else English. Full list: GET /options?kind=languages |
 | `duration` | `30` \| `60` \| `90` | no | Target episode length in seconds (30, 60 or 90) |
 | `destination` | string | no | Primary auto-post destination platform, e.g. youtube or tiktok |
 | `destinationAccounts` | mixed | no | Which connected account each platform posts through, by platform, e.g. {"youtube":["<authId>"],"tiktok":["<authId>"]} with authIds from GET /accounts. Every id must be an account of this team on that platform, or the request is rejected. A platform with no entry posts through the team's default account. On update only the platforms you send change; null clears every pin |
