@@ -638,6 +638,9 @@ Body fields:
 | `hashtags` | string | no | Hashtags appended to post captions |
 | `tone` | string | no | Writing tone for generated scripts |
 | `youtubePrivacyStatus` | `public` \| `unlisted` \| `private` | no | Privacy for auto-posted YouTube videos |
+| `episodeTitleMode` | `unique` \| `series_numbered` | no | How episodes are titled when they post. "unique" (the default): every episode posts its own title. "series_numbered": every episode posts as "<seriesDisplayTitle> - Episode N" on YouTube, and every other platform's caption opens with that line above the episode's usual caption. N is the episode's place in a serial (Micro Drama) or the next number of the series, and never changes once an episode is made |
+| `seriesDisplayTitle` | string | no | The series title numbered episodes carry. Empty uses a serial's own story title, then the series name |
+| `episodeTitleSeparator` | `hyphen` \| `em_dash` \| `pipe` \| `colon` | no | What joins the series title and the episode number: hyphen ("Title - Episode 1", the default), em_dash, pipe ("Title | Episode 1") or colon ("Title: Episode 1") |
 
 Example:
 
@@ -785,6 +788,9 @@ Body fields:
 | `hashtags` | string | no | Hashtags appended to post captions |
 | `tone` | string | no | Writing tone for generated scripts |
 | `youtubePrivacyStatus` | `public` \| `unlisted` \| `private` | no | Privacy for auto-posted YouTube videos |
+| `episodeTitleMode` | `unique` \| `series_numbered` | no | How episodes are titled when they post. "unique" (the default): every episode posts its own title. "series_numbered": every episode posts as "<seriesDisplayTitle> - Episode N" on YouTube, and every other platform's caption opens with that line above the episode's usual caption. N is the episode's place in a serial (Micro Drama) or the next number of the series, and never changes once an episode is made |
+| `seriesDisplayTitle` | string | no | The series title numbered episodes carry. Empty uses a serial's own story title, then the series name |
+| `episodeTitleSeparator` | `hyphen` \| `em_dash` \| `pipe` \| `colon` | no | What joins the series title and the episode number: hyphen ("Title - Episode 1", the default), em_dash, pipe ("Title | Episode 1") or colon ("Title: Episode 1") |
 | `paused` | boolean | no | Pause or resume automatic episode generation |
 
 Example:
