@@ -929,7 +929,7 @@ Response:
 
 `POST /posts`
 
-Immediately publishes a rendered video to one connected platform (youtube, tiktok, instagram, x, facebook, linkedin or threads). The video must be rendered first (renderedVideoUrl present, or pass videoUrl explicitly) and the team must have that platform connected (GET /accounts). For future-dated posting use POST /posts/schedule instead.
+Immediately publishes a rendered video to one connected platform (youtube, tiktok, instagram, x, facebook, linkedin or threads). The video must be rendered first (renderedVideoUrl present, or pass videoUrl explicitly) and the team must have that platform connected (GET /accounts). A YouTube channel gets a video once: publishing it again to a channel that already has it answers 409 conflict unless allowRepost is true. For future-dated posting use POST /posts/schedule instead.
 
 - Scopes: `posts:write`
 - Credits: none
@@ -948,6 +948,7 @@ Body fields:
 | `description` | string | no | Longer description for platforms that support one (YouTube, Facebook, LinkedIn) |
 | `privacyStatus` | `public` \| `unlisted` \| `private` | no | YouTube only; defaults to public |
 | `authId` | string | no | Specific connected account id when the team has several for the platform (from GET /accounts) |
+| `allowRepost` | boolean | no | YouTube only: upload it again even though this video is already on that channel. Without it, a repeat is refused with 409 conflict and nothing is uploaded |
 
 Example:
 
