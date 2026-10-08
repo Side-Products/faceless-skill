@@ -638,6 +638,8 @@ Body fields:
 | `hashtags` | string | no | Hashtags appended to post captions |
 | `tone` | string | no | Writing tone for generated scripts |
 | `youtubePrivacyStatus` | `public` \| `unlisted` \| `private` | no | Privacy for auto-posted YouTube videos |
+| `youtubeMadeForKids` | boolean | no | Declare auto-posted YouTube videos as made for kids (COPPA). Omitted: on for kids formats (Nursery Rhymes, bedtime-stories, good-morals, kids language lessons), not sent otherwise |
+| `tiktokPrivacyLevel` | `PUBLIC_TO_EVERYONE` \| `MUTUAL_FOLLOW_FRIENDS` \| `SELF_ONLY` | no | Who can see auto-posted TikTok posts: PUBLIC_TO_EVERYONE (the default), MUTUAL_FOLLOW_FRIENDS or SELF_ONLY. A private TikTok account posts to its followers when PUBLIC_TO_EVERYONE is asked |
 | `episodeTitleMode` | `unique` \| `series_numbered` | no | How episodes are titled when they post. "unique" (the default): every episode posts its own title. "series_numbered": every episode posts as "<seriesDisplayTitle> - Episode N" on YouTube, and every other platform's caption opens with that line above the episode's usual caption. N is the episode's place in a serial (Micro Drama) or the next number of the series, and never changes once an episode is made |
 | `seriesDisplayTitle` | string | no | The series title numbered episodes carry. Empty uses a serial's own story title, then the series name |
 | `episodeTitleSeparator` | `hyphen` \| `em_dash` \| `pipe` \| `colon` | no | What joins the series title and the episode number: hyphen ("Title - Episode 1", the default), em_dash, pipe ("Title | Episode 1") or colon ("Title: Episode 1") |
@@ -788,6 +790,8 @@ Body fields:
 | `hashtags` | string | no | Hashtags appended to post captions |
 | `tone` | string | no | Writing tone for generated scripts |
 | `youtubePrivacyStatus` | `public` \| `unlisted` \| `private` | no | Privacy for auto-posted YouTube videos |
+| `youtubeMadeForKids` | boolean | no | Declare auto-posted YouTube videos as made for kids (COPPA). Omitted: on for kids formats (Nursery Rhymes, bedtime-stories, good-morals, kids language lessons), not sent otherwise |
+| `tiktokPrivacyLevel` | `PUBLIC_TO_EVERYONE` \| `MUTUAL_FOLLOW_FRIENDS` \| `SELF_ONLY` | no | Who can see auto-posted TikTok posts: PUBLIC_TO_EVERYONE (the default), MUTUAL_FOLLOW_FRIENDS or SELF_ONLY. A private TikTok account posts to its followers when PUBLIC_TO_EVERYONE is asked |
 | `episodeTitleMode` | `unique` \| `series_numbered` | no | How episodes are titled when they post. "unique" (the default): every episode posts its own title. "series_numbered": every episode posts as "<seriesDisplayTitle> - Episode N" on YouTube, and every other platform's caption opens with that line above the episode's usual caption. N is the episode's place in a serial (Micro Drama) or the next number of the series, and never changes once an episode is made |
 | `seriesDisplayTitle` | string | no | The series title numbered episodes carry. Empty uses a serial's own story title, then the series name |
 | `episodeTitleSeparator` | `hyphen` \| `em_dash` \| `pipe` \| `colon` | no | What joins the series title and the episode number: hyphen ("Title - Episode 1", the default), em_dash, pipe ("Title | Episode 1") or colon ("Title: Episode 1") |
@@ -929,7 +933,7 @@ Response:
 
 `POST /posts`
 
-Immediately publishes a rendered video to one connected platform (youtube, tiktok, instagram, x, facebook, linkedin or threads). The video must be rendered first (renderedVideoUrl present, or pass videoUrl explicitly) and the team must have that platform connected (GET /accounts). A YouTube channel gets a video once: publishing it again to a channel that already has it answers 409 conflict unless allowRepost is true. For future-dated posting use POST /posts/schedule instead.
+Immediately publishes a rendered video to one connected platform (youtube, tiktok, instagram, x, facebook, linkedin or threads). The video must be rendered first (renderedVideoUrl present, or pass videoUrl explicitly) and the team must have that platform connected (GET /accounts). A YouTube channel or TikTok account gets a video once: publishing it again to one that already has it answers 409 conflict unless allowRepost is true. For future-dated posting use POST /posts/schedule instead.
 
 - Scopes: `posts:write`
 - Credits: none
@@ -947,8 +951,10 @@ Body fields:
 | `title` | string | no | Post title or caption (platform-appropriate); falls back to the video's stored post metadata |
 | `description` | string | no | Longer description for platforms that support one (YouTube, Facebook, LinkedIn) |
 | `privacyStatus` | `public` \| `unlisted` \| `private` | no | YouTube only; defaults to public |
+| `madeForKids` | boolean | no | YouTube only: declare the video made for kids (COPPA). Omitted: the video's stored choice, else on for kids formats, else not sent |
+| `tiktokPrivacyLevel` | `PUBLIC_TO_EVERYONE` \| `MUTUAL_FOLLOW_FRIENDS` \| `SELF_ONLY` | no | TikTok only: who can see the post; defaults to PUBLIC_TO_EVERYONE (followers, on a private TikTok account) |
 | `authId` | string | no | Specific connected account id when the team has several for the platform (from GET /accounts) |
-| `allowRepost` | boolean | no | YouTube only: upload it again even though this video is already on that channel. Without it, a repeat is refused with 409 conflict and nothing is uploaded |
+| `allowRepost` | boolean | no | YouTube and TikTok: post it again even though this video is already on that channel or account. Without it, a repeat is refused with 409 conflict and nothing is posted |
 
 Example:
 
