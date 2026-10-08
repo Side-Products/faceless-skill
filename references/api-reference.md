@@ -634,6 +634,7 @@ Body fields:
 | `showEmojis` | boolean | no | Overlay emojis on captions |
 | `enableBackgroundMusic` | boolean | no | Mix background music under the narration |
 | `enableVoiceover` | boolean | no | Story Slides and News Slides only: an AI voice reads each slide, using `voice` (a default voice when omitted). Defaults to false (music only) |
+| `slidesLength` | `short` \| `medium` \| `long` | no | Story Slides and News Slides only: episode length. "short" (about 20s, 5-6 slides, the default), "medium" (about 40s, about 12 slides) or "long" (about 60s, about 18 slides). Each slide stays on screen just as long, so longer means more slides. Priced per slide: medium costs 2x and long 3x the short price |
 | `backgroundMusicMood` | string | no | Background music mood. Full list: GET /options?kind=music |
 | `hashtags` | string | no | Hashtags appended to post captions |
 | `tone` | string | no | Writing tone for generated scripts |
@@ -786,6 +787,7 @@ Body fields:
 | `showEmojis` | boolean | no | Overlay emojis on captions |
 | `enableBackgroundMusic` | boolean | no | Mix background music under the narration |
 | `enableVoiceover` | boolean | no | Story Slides and News Slides only: an AI voice reads each slide, using `voice` (a default voice when omitted). Defaults to false (music only) |
+| `slidesLength` | `short` \| `medium` \| `long` | no | Story Slides and News Slides only: episode length. "short" (about 20s, 5-6 slides, the default), "medium" (about 40s, about 12 slides) or "long" (about 60s, about 18 slides). Each slide stays on screen just as long, so longer means more slides. Priced per slide: medium costs 2x and long 3x the short price |
 | `backgroundMusicMood` | string | no | Background music mood. Full list: GET /options?kind=music |
 | `hashtags` | string | no | Hashtags appended to post captions |
 | `tone` | string | no | Writing tone for generated scripts |
