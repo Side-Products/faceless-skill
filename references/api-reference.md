@@ -638,6 +638,7 @@ Body fields:
 | `backgroundMusicMood` | string | no | Background music mood. Full list: GET /options?kind=music |
 | `hashtags` | string | no | Hashtags appended to post captions |
 | `tone` | string | no | Writing tone for generated scripts |
+| `scriptureTranslation` | `kjv` \| `web` \| `drb` | no | Bible translation scripture is quoted from word for word: kjv, web or drb. null follows the brief, else kjv |
 | `youtubePrivacyStatus` | `public` \| `unlisted` \| `private` | no | Privacy for auto-posted YouTube videos |
 | `youtubeMadeForKids` | boolean | no | Declare auto-posted YouTube videos as made for kids (COPPA). Omitted: on for kids formats (Nursery Rhymes, bedtime-stories, good-morals, kids language lessons), not sent otherwise |
 | `tiktokPrivacyLevel` | `PUBLIC_TO_EVERYONE` \| `MUTUAL_FOLLOW_FRIENDS` \| `SELF_ONLY` | no | Who can see auto-posted TikTok posts: PUBLIC_TO_EVERYONE (the default), MUTUAL_FOLLOW_FRIENDS or SELF_ONLY. A private TikTok account posts to its followers when PUBLIC_TO_EVERYONE is asked |
@@ -792,6 +793,7 @@ Body fields:
 | `backgroundMusicMood` | string | no | Background music mood. Full list: GET /options?kind=music |
 | `hashtags` | string | no | Hashtags appended to post captions |
 | `tone` | string | no | Writing tone for generated scripts |
+| `scriptureTranslation` | `kjv` \| `web` \| `drb` | no | Bible translation scripture is quoted from word for word: kjv, web or drb. null follows the brief, else kjv |
 | `youtubePrivacyStatus` | `public` \| `unlisted` \| `private` | no | Privacy for auto-posted YouTube videos |
 | `youtubeMadeForKids` | boolean | no | Declare auto-posted YouTube videos as made for kids (COPPA). Omitted: on for kids formats (Nursery Rhymes, bedtime-stories, good-morals, kids language lessons), not sent otherwise |
 | `tiktokPrivacyLevel` | `PUBLIC_TO_EVERYONE` \| `MUTUAL_FOLLOW_FRIENDS` \| `SELF_ONLY` | no | Who can see auto-posted TikTok posts: PUBLIC_TO_EVERYONE (the default), MUTUAL_FOLLOW_FRIENDS or SELF_ONLY. A private TikTok account posts to its followers when PUBLIC_TO_EVERYONE is asked |
