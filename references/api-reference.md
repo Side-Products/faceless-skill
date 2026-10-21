@@ -1413,6 +1413,103 @@ Response:
 }
 ```
 
+## fast-track
+
+### List Fast Track video types, categories and scripts
+
+`GET /fast-track`
+
+Fast Track is the quickest way to a video: pick a video type, a category and a script, and its voice and visuals are set. Call with no query for the video types (how many scripts each has and its price in credits), with source for that type's categories (niche, language, count), and with source, niche and language for up to 20 scripts (id, preview, coverUrl, seconds). Get one with POST /fast-track. Free.
+
+- Scopes: `videos:read`
+- Credits: none
+- CLI: `faceless fast-track list`
+- MCP tool: `faceless_list_fast_track`
+
+Query parameters:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `source` | string | no | A video type from the list without a query, e.g. Facts & stories |
+| `niche` | string | no | A category of that type, e.g. scary-stories (needs source) |
+| `language` | string | no | Language code of the scripts, e.g. en (default en) |
+
+Example:
+
+```bash
+curl -s "https://faceless.so/api/v1/fast-track" \
+  -H "Authorization: Bearer $FACELESS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"source":"Facts & stories","niche":"scary-stories","language":"en"}'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "videos": [
+      {
+        "id": "665f1b2a9c31a2b3c4d5ef01",
+        "preview": "The lighthouse keeper heard knocking at midnight. Nobody had climbed the stairs in years.",
+        "coverUrl": "https://exports.faceless.so/thumbs/665f1b2a9c31a2b3c4d5ef01.jpg",
+        "seconds": 52
+      }
+    ],
+    "credits": 10
+  }
+}
+```
+
+### Get a Fast Track video
+
+`POST /fast-track`
+
+Gets the picked Fast Track script (an id from GET /fast-track) as a video in the team's library, with its voice and visuals set, and charges its price at once: 10 credits, or 3 for Slideshows, Single Fade-in Video and 2x2 Grid Video. The title, captions, music and cover can be changed in the editor; the voice cannot. The video is ready straight away. 409 when the script is no longer available: list again and pick another.
+
+- Scopes: `videos:write`
+- Credits: 10 credits (3 for Slideshows, Single Fade-in Video and 2x2 Grid Video), charged at purchase
+- Rate limit: 10 per 60s
+- Supports `Idempotency-Key` header
+- CLI: `faceless fast-track buy`
+- MCP tool: `faceless_buy_fast_track_video`
+
+Body fields:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `fastTrackVideoId` | string | yes | A script id from GET /fast-track |
+
+Example:
+
+```bash
+curl -s -X POST "https://faceless.so/api/v1/fast-track" \
+  -H "Authorization: Bearer $FACELESS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"fastTrackVideoId":"665f1b2a9c31a2b3c4d5ef01"}'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "665f1b2a9c31a2b3c4d5ea01",
+    "name": "The lighthouse keeper heard knocking at midnight.",
+    "platform": "tts",
+    "model": "storyboard",
+    "status": "completed",
+    "thumbnailUrl": "https://exports.faceless.so/thumbs/665f1b2a9c31a2b3c4d5ef01.jpg",
+    "renderedVideoUrl": null,
+    "createdAt": "2026-10-21T18:13:00.000Z",
+    "creditsUsed": 10,
+    "statusUrl": "/api/v1/videos/665f1b2a9c31a2b3c4d5ea01/status"
+  }
+}
+```
+
 ## ads
 
 ### Search Meta ads shown in the EU and UK

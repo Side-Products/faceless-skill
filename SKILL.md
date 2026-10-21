@@ -70,6 +70,8 @@ If npm is unavailable, fall back to the raw HTTP API (see the last section).
 | `faceless options` | List content option catalogs | GET /options |
 | `faceless assets create` | Register a media asset by URL | POST /assets |
 | `faceless analytics` | Cross-platform posting analytics | GET /analytics |
+| `faceless fast-track list` | List Fast Track video types, categories and scripts | GET /fast-track |
+| `faceless fast-track buy` | Get a Fast Track video | POST /fast-track |
 | `faceless ads search` | Search Meta ads shown in the EU and UK | GET /ads/search |
 | `faceless ads saved` | List the team's saved ads | GET /saved-ads |
 | `faceless ads save` | Save an ad from a search | POST /saved-ads |
