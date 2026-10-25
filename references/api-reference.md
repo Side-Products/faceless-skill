@@ -1419,7 +1419,7 @@ Response:
 
 `GET /fast-track`
 
-Fast Track is the quickest way to a video: pick a video type, a category and a script, and its voice and visuals are set. Call with no query for the video types (how many scripts each has and its price in credits), with source for that type's categories (niche, language, count), and with source, niche and language for up to 20 scripts (id, preview, coverUrl, seconds). Get one with POST /fast-track. Free.
+Fast Track is the quickest way to a video: pick a video type, a category and a script. These are finished videos from the Fast Track library and one can be sold to up to 3 channels; each copy gets its own title, music, caption style and framing, and a narrated story a different voice. Call with no query for the video types (how many scripts each has and its price in credits), with source for that type's categories (niche, language, count), and with source, niche and language for up to 20 scripts (id, preview, coverUrl, seconds). Get one with POST /fast-track. Free.
 
 - Scopes: `videos:read`
 - Credits: none
@@ -1466,7 +1466,7 @@ Response:
 
 `POST /fast-track`
 
-Gets the picked Fast Track script (an id from GET /fast-track) as a video in the team's library, with its voice and visuals set, and charges its price at once: 10 credits, or 3 for Slideshows, Single Fade-in Video and 2x2 Grid Video. The title, captions, music and cover can be changed in the editor; the voice cannot. The video is ready straight away. 409 when the script is no longer available: list again and pick another.
+Gets the picked Fast Track script (an id from GET /fast-track) as a video in the team's library, made its own (title, music, caption style, framing; a narrated story a different voice), and charges its price at once: 10 credits, or 3 for Slideshows, Single Fade-in Video and 2x2 Grid Video. The title, captions, music and cover can be changed in the editor; the voice cannot. The video opens straight away; its file is rendered within minutes. 409 when the script is no longer available: list again and pick another.
 
 - Scopes: `videos:write`
 - Credits: 10 credits (3 for Slideshows, Single Fade-in Video and 2x2 Grid Video), charged at purchase
