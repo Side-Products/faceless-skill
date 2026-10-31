@@ -170,7 +170,8 @@ Body fields:
 | `style` | string | no | Visual style for generated imagery. Full list: GET /options?kind=styles |
 | `language` | string | no | Script language, e.g. English. Full list: GET /options?kind=languages |
 | `name` | string | no | Project name; defaults to the start of the script |
-| `enableBackgroundMusic` | boolean | no | Mix background music under the narration |
+| `enableBackgroundMusic` | boolean | no | Mix background music under the narration. Omit to use the team's default (Team settings > Video defaults), else music is on for storyboard and motion |
+| `enableSoundEffects` | boolean | no | Automatic sound effects (whooshes, hits and an ambience bed). false makes a video with only the voice and any music. Omit to use the team's default (Team settings > Video defaults), else on |
 | `masterStyle` | string | no | Extra style directive applied to every generated scene |
 | `globalNegativePrompt` | string | no | Things the image model should avoid in every scene |
 
