@@ -244,6 +244,60 @@ Response:
 }
 ```
 
+### Create a faceless video from your own voiceover recording
+
+`POST /videos/audio`
+
+Creates an AI faceless video over a voiceover you recorded yourself: AI-generated visuals for every line, captions, and no AI voice. Pass a public link to the audio file; a Google Drive share link (set to "Anyone with the link") or a Dropbox link works as it is. Any common phone format (m4a, mp3, wav, ogg, webm) up to 90 seconds; it is levelled to narration loudness. The same art direction as POST /videos applies: style, masterStyle and globalNegativePrompt (a people ban, e.g. "people, hands, animals", keeps every frame free of them and each picture is checked). Pass the words you say as script so the captions spell them your way (recitation and names included). Music and sound effects follow the team's Video defaults unless set here. Generation is asynchronous; poll GET /videos/{id}/status, then POST /videos/{id}/render, then schedule as usual. Credits are charged now, at creation, the same as POST /videos.
+
+- Scopes: `videos:write`
+- Credits: 20 credits (storyboard), 50 (motion_lite) or 100 (motion_pro) per video, charged at creation
+- Rate limit: 10 per 60s
+- Supports `Idempotency-Key` header
+- CLI: `faceless videos from-audio`
+- MCP tool: `faceless_create_video_from_audio`
+
+Body fields:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `audioUrl` | string | yes | Public link to your recording: a Google Drive share link ("Anyone with the link"), a Dropbox link or a direct file URL. Up to 90 seconds |
+| `model` | `storyboard` \| `motion_lite` \| `motion_pro` | no | Generation model: storyboard (20 credits, static scenes), motion_lite (50, animated transitions), motion_pro (100, cinematic) |
+| `style` | string | no | Visual style for generated imagery. Full list: GET /options?kind=styles |
+| `masterStyle` | string | no | Extra style directive applied to every generated scene, e.g. "Nature landscapes only: mountains, rivers, sky at sunrise" |
+| `globalNegativePrompt` | string | no | Things never to show in any scene, e.g. "people, faces, hands, animals, birds, insects, buildings, text" |
+| `script` | string | no | The words you say in the recording. Captions take their spelling from it (the timing comes from your audio) and the visuals follow it. Omit to caption and picture what the transcriber hears |
+| `language` | string | no | Spoken language of the recording, e.g. English (the default). For English speech with Quran recitation or Arabic supplications, pass ar (Classic Arabic): that transcriber hears both and keeps the English words English. Full list: GET /options?kind=languages |
+| `name` | string | no | Project name |
+| `enableBackgroundMusic` | boolean | no | Mix background music under your voice. Omit to use the team's default (Team settings > Video defaults), else off |
+| `enableSoundEffects` | boolean | no | Sound effects on transitions. false keeps only your voice and any music. Omit to use the team's default (Team settings > Video defaults) |
+
+Example:
+
+```bash
+curl -s -X POST "https://faceless.so/api/v1/videos/audio" \
+  -H "Authorization: Bearer $FACELESS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"audioUrl":"https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz012345/view?usp=sharing","model":"storyboard","masterStyle":"Nature landscapes only: mountains, rivers, lakes, sky at sunrise","globalNegativePrompt":"people, faces, hands, animals, birds, insects, buildings, text","enableBackgroundMusic":false,"enableSoundEffects":false}'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "665f1b2a9c31a2b3c4d5e803",
+    "name": "Morning reminder",
+    "model": "storyboard",
+    "status": "processing",
+    "creditsUsed": 20,
+    "audioSeconds": 41.2,
+    "statusUrl": "/api/v1/videos/665f1b2a9c31a2b3c4d5e803/status"
+  }
+}
+```
+
 ### List the team's videos
 
 `GET /videos`

@@ -45,6 +45,7 @@ If npm is unavailable, fall back to the raw HTTP API (see the last section).
 | `faceless buy-credits` | Buy a credit pack with an agent payment token | POST /credits |
 | `faceless videos create` | Create a faceless video from a script | POST /videos |
 | `faceless videos captions` | Caption an existing video or audio file | POST /videos/captions |
+| `faceless videos from-audio` | Create a faceless video from your own voiceover recording | POST /videos/audio |
 | `faceless videos list` | List the team's videos | GET /videos |
 | `faceless videos get` | Get one video | GET /videos/{id} |
 | `faceless videos update` | Update a video's name or post metadata | PATCH /videos/{id} |
