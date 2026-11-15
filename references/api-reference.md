@@ -668,7 +668,7 @@ Body fields:
 | `source` | string | yes | Content source that scripts every episode, e.g. "Facts & stories", "Reddit post", "Custom prompt". Full list: GET /options?kind=sources |
 | `niche` | string | no | Content niche, e.g. scary stories, motivation. Full list: GET /options?kind=niches |
 | `customPrompt` | string | no | Custom topic prompt used instead of (or alongside) a niche |
-| `voice` | string | no | TTS voice id for narration. Full list: GET /voices |
+| `voice` | string | no | TTS voice id for narration. Full list: GET /voices. Not used where the video model voices the characters so the lips match: Character Vlog, Time-Traveller POV and Body Reacts (unless set to the narrator in the app), Fruit Drama, Micro Drama, Street Interview and Talent Show |
 | `style` | string | no | Visual style for generated imagery. Full list: GET /options?kind=styles |
 | `language` | string | no | Video language, e.g. English. Omitted on create, it is the voice's own language when the voice is made for one language (a Spanish voice gives Spanish), else English. Full list: GET /options?kind=languages |
 | `duration` | `30` \| `60` \| `90` | no | Target episode length in seconds (30, 60 or 90) |
@@ -826,7 +826,7 @@ Body fields:
 | `source` | string | no | Content source that scripts every episode, e.g. "Facts & stories", "Reddit post", "Custom prompt". Full list: GET /options?kind=sources |
 | `niche` | string | no | Content niche, e.g. scary stories, motivation. Full list: GET /options?kind=niches |
 | `customPrompt` | string | no | Custom topic prompt used instead of (or alongside) a niche |
-| `voice` | string | no | TTS voice id for narration. Full list: GET /voices |
+| `voice` | string | no | TTS voice id for narration. Full list: GET /voices. Not used where the video model voices the characters so the lips match: Character Vlog, Time-Traveller POV and Body Reacts (unless set to the narrator in the app), Fruit Drama, Micro Drama, Street Interview and Talent Show |
 | `style` | string | no | Visual style for generated imagery. Full list: GET /options?kind=styles |
 | `language` | string | no | Video language, e.g. English. Omitted on create, it is the voice's own language when the voice is made for one language (a Spanish voice gives Spanish), else English. Full list: GET /options?kind=languages |
 | `duration` | `30` \| `60` \| `90` | no | Target episode length in seconds (30, 60 or 90) |
