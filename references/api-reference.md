@@ -1547,7 +1547,7 @@ Response:
 
 `GET /analytics`
 
-Returns aggregated performance for the team's published posts (views, likes, comments and posting volume) across YouTube, TikTok, Instagram and Facebook, over a trailing window.
+Returns performance for the team's published posts over a trailing window: aggregated views, likes, comments and posting volume for TikTok, Instagram and Facebook, and top posts per platform. YouTube is reported per video only (videos published in the last 30 days): views, likes and comments from the YouTube Data API plus average view percentage, average view duration and engaged views from the YouTube Analytics API when available; youtubeVideoStats explains the sources and any missing metric.
 
 - Scopes: `analytics:read`
 - Credits: none
@@ -1594,7 +1594,7 @@ Response:
       }
     },
     "byPlatform": {
-      "youtube": {
+      "tiktok": {
         "totalViews": 88000,
         "postsSynced": 20,
         "viewsGained28d": 9400
@@ -1603,11 +1603,42 @@ Response:
     "topPosts": [
       {
         "platform": "youtube",
+        "videoId": "dQw4w9WgXcQ",
         "title": "Deep sea rivers",
         "views": 42000,
-        "postUrl": "https://youtube.com/shorts/example"
+        "likes": 1800,
+        "comments": 64,
+        "shares": null,
+        "averageViewPercentage": 87.4,
+        "averageViewDurationSeconds": 31,
+        "engagedViews": 30500,
+        "analyticsStatus": "ok",
+        "postUrl": "https://youtube.com/shorts/dQw4w9WgXcQ"
+      },
+      {
+        "platform": "tiktok",
+        "title": "Deep sea rivers",
+        "views": 12500,
+        "likes": 900,
+        "comments": 31,
+        "shares": 12,
+        "postUrl": "https://www.tiktok.com/@example/video/1"
       }
     ],
+    "youtubeVideoStats": {
+      "videosShown": 12,
+      "videosInWindow": 30,
+      "windowDays": 28,
+      "analytics": {
+        "available": true,
+        "metrics": [
+          "averageViewPercentage",
+          "averageViewDuration",
+          "engagedViews"
+        ],
+        "reason": null
+      }
+    },
     "totals": {
       "totalViews": 128530,
       "postsSynced": 42,
