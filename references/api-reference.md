@@ -248,7 +248,7 @@ Response:
 
 `POST /videos/audio`
 
-Creates an AI faceless video over a voiceover you recorded yourself: AI-generated visuals for every line, captions, and no AI voice. Pass a public link to the audio file; a Google Drive share link (set to "Anyone with the link") or a Dropbox link works as it is. Any common phone format (m4a, mp3, wav, ogg, webm) up to 90 seconds; it is levelled to narration loudness. The same art direction as POST /videos applies: style, masterStyle and globalNegativePrompt (a people ban, e.g. "people, hands, animals", keeps every frame free of them and each picture is checked). Pass the words you say as script so the captions spell them your way (recitation and names included). Music and sound effects follow the team's Video defaults unless set here. Generation is asynchronous; poll GET /videos/{id}/status, then POST /videos/{id}/render, then schedule as usual. Credits are charged now, at creation, the same as POST /videos.
+Creates an AI faceless video over a voiceover you recorded yourself: AI-generated visuals for every line, captions, and no AI voice. Pass a public link to the audio file; a Google Drive share link (set to "Anyone with the link") or a Dropbox link works as it is. Any common phone format (m4a, mp3, wav, ogg, webm) up to 90 seconds; it is levelled to narration loudness. The same art direction as POST /videos applies: style, masterStyle and globalNegativePrompt (a people ban, e.g. "people, hands, animals", keeps every frame free of them and each picture is checked). Pass the words you say as script so the captions spell them your way (recitation and names included). Music and sound effects follow the team's Video defaults unless set here. To show your own pictures (screenshots, photos) at chosen moments, pass images: each at a time or at words said, as an overlay card or full screen; the rest stays generated visuals (placing pictures costs nothing extra). Generation is asynchronous; poll GET /videos/{id}/status (it also reports which pictures were placed), then POST /videos/{id}/render, then schedule as usual. Credits are charged now, at creation, the same as POST /videos.
 
 - Scopes: `videos:write`
 - Credits: 20 credits (storyboard), 50 (motion_lite) or 100 (motion_pro) per video, charged at creation
@@ -271,6 +271,7 @@ Body fields:
 | `name` | string | no | Project name |
 | `enableBackgroundMusic` | boolean | no | Mix background music under your voice. Omit to use the team's default (Team settings > Video defaults), else off |
 | `enableSoundEffects` | boolean | no | Sound effects on transitions. false keeps only your voice and any music. Omit to use the team's default (Team settings > Video defaults) |
+| `images` | array | no | Your own pictures shown at chosen moments, e.g. a client-review screenshot while you read it. Words in at/until must be in script when you pass one. Up to 20 |
 
 Example:
 
@@ -619,6 +620,68 @@ Response:
   "data": {
     "renderId": "abcd1234efgh",
     "statusUrl": "/api/v1/renders/abcd1234efgh"
+  }
+}
+```
+
+### Place your own pictures in a video
+
+`POST /videos/{id}/images`
+
+Shows your own pictures (screenshots, photos) in a video that has finished generating: each at a time or at words said in it, as an overlay card over the scene (whole picture visible, clear of the captions) or full screen. Images are ids from faceless_upload_image / faceless_list_assets or public links. Captions stay on top. replace: true first removes pictures placed earlier (to move or change them). Free: no credits and no AI generation. Then POST /videos/{id}/render for the MP4 and schedule as usual. Pictures whose words are not found are skipped and listed with the reason.
+
+- Scopes: `videos:write`
+- Credits: none
+- Rate limit: 20 per 60s
+- CLI: `faceless videos place-images`
+- MCP tool: `faceless_place_images`
+
+Body fields:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `images` | array | yes | The pictures and when and how each shows. Up to 20 |
+| `replace` | boolean | no | Remove the pictures placed earlier by this tool before placing these (default false: add to them) |
+
+Example:
+
+```bash
+curl -s -X POST "https://faceless.so/api/v1/videos/<id>/images" \
+  -H "Authorization: Bearer $FACELESS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"images":[{"image":"665f1b2a9c31a2b3c4d5ef02","at":"Sarah wrote to us","until":"best decision I made","mode":"overlay"},{"image":"665f1b2a9c31a2b3c4d5ef03","at":21.5,"duration":3,"mode":"fullscreen"}]}'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "665f1b2a9c31a2b3c4d5e803",
+    "placed": [
+      {
+        "picture": 1,
+        "image": "665f1b2a9c31a2b3c4d5ef02",
+        "mode": "overlay",
+        "fit": "contain",
+        "startSeconds": 8.42,
+        "endSeconds": 14.1
+      },
+      {
+        "picture": 2,
+        "image": "665f1b2a9c31a2b3c4d5ef03",
+        "mode": "fullscreen",
+        "fit": "contain",
+        "startSeconds": 21.5,
+        "endSeconds": 24.5
+      }
+    ],
+    "skipped": [],
+    "removed": 0,
+    "ownImagesInVideo": 2,
+    "renderNeeded": true,
+    "message": "Placed. Call POST /videos/{id}/render (faceless_render_video) for an MP4 with the pictures in it."
   }
 }
 ```
@@ -1503,7 +1566,7 @@ Response:
 
 `POST /assets`
 
-Registers an already-hosted media file (video, image or audio URL) as a team asset usable in projects. This endpoint takes a URL, not raw bytes; host the file anywhere public (or use the dashboard for direct uploads).
+Registers an already-hosted media file (video, image or audio URL) as a team asset usable in projects. The link is recorded as it is, not copied; for a picture to show in a video, use POST /assets/images (faceless_upload_image), which copies and checks it.
 
 - Scopes: `assets:write`
 - Credits: none
@@ -1517,7 +1580,7 @@ Body fields:
 | --- | --- | --- | --- |
 | `url` | string | yes | Public URL of the media file |
 | `name` | string | no | Display name for the asset |
-| `fileType` | string | no | MIME type hint, e.g. video/mp4 |
+| `fileType` | string | no | Kind (image, video, audio) or MIME type, e.g. video/mp4. Omit to infer it from the link |
 
 Example:
 
@@ -1537,6 +1600,107 @@ Response:
     "id": "665f1b2a9c31a2b3c4d5ef01",
     "url": "https://example.com/broll.mp4",
     "name": "Intro b-roll"
+  }
+}
+```
+
+### Upload your own image
+
+`POST /assets/images`
+
+Adds a picture (a screenshot, photo or logo) to the team's media library so it can be shown in videos (faceless_create_video_from_audio images, faceless_place_images) and in the editor. Pass url (a Google Drive share link set to "Anyone with the link", a Dropbox link or a direct image URL; up to 15 MB) or data (base64 or a data:image/...;base64, URI; up to 2.5 MB). JPG, PNG, WebP, GIF (first frame) or AVIF; an iPhone HEIC must be exported as JPG first. The picture is checked, turned upright, scaled to at most 2160 px on its long side and hosted on faceless.so. Returns the image id. Free.
+
+- Scopes: `assets:write`
+- Credits: none
+- Rate limit: 30 per 60s
+- Supports `Idempotency-Key` header
+- CLI: `faceless assets upload-image`
+- MCP tool: `faceless_upload_image`
+
+Body fields:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `url` | string | no | Public link to the picture: a Google Drive share link ("Anyone with the link"), a Dropbox link or a direct image URL |
+| `data` | string | no | The picture itself as base64, or a data:image/png;base64,... URI (up to 2.5 MB). Use url for anything larger |
+| `name` | string | no | Display name in the media library, e.g. "Review from Sarah" |
+
+Example:
+
+```bash
+curl -s -X POST "https://faceless.so/api/v1/assets/images" \
+  -H "Authorization: Bearer $FACELESS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz012345/view?usp=sharing","name":"Review from Sarah"}'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "665f1b2a9c31a2b3c4d5ef02",
+    "url": "https://exports.faceless.so/uploads/own-images/665f1b2a9c31a2b3c4d5e000/0d4c7a52-7f0e-4d3b-9a43-3c5c1d9b2e10.jpg",
+    "name": "Review from Sarah",
+    "fileType": "image",
+    "createdAt": "2026-11-17T10:00:00.000Z",
+    "width": 1170,
+    "height": 2532,
+    "bytes": 412345
+  }
+}
+```
+
+### List the team's media library
+
+`GET /assets`
+
+Lists the team's uploaded media, newest first: pictures added with faceless_upload_image and files uploaded in the Faceless editor. Use type=image to find picture ids for faceless_place_images or faceless_create_video_from_audio images.
+
+- Scopes: `assets:read`
+- Credits: none
+- CLI: `faceless assets list`
+- MCP tool: `faceless_list_assets`
+
+Query parameters:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `type` | `image` \| `video` \| `audio` | no | Only this kind of media |
+| `page` | integer | no | Page number, starting at 1 |
+| `limit` | integer | no | Items per page (max 100) |
+
+Example:
+
+```bash
+curl -s "https://faceless.so/api/v1/assets" \
+  -H "Authorization: Bearer $FACELESS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"type":"image"}'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "665f1b2a9c31a2b3c4d5ef02",
+      "url": "https://exports.faceless.so/uploads/own-images/665f1b2a9c31a2b3c4d5e000/0d4c7a52-7f0e-4d3b-9a43-3c5c1d9b2e10.jpg",
+      "name": "Review from Sarah",
+      "fileType": "image",
+      "createdAt": "2026-11-17T10:00:00.000Z",
+      "width": 1170,
+      "height": 2532,
+      "bytes": 412345
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 1
   }
 }
 ```

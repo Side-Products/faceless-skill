@@ -52,6 +52,7 @@ If npm is unavailable, fall back to the raw HTTP API (see the last section).
 | `faceless videos select-thumbnail` | Choose which thumbnail a video uses | POST /videos/{id}/thumbnail |
 | `faceless videos status` | Poll video generation progress | GET /videos/{id}/status |
 | `faceless videos render` | Render a video to MP4 | POST /videos/{id}/render |
+| `faceless videos place-images` | Place your own pictures in a video | POST /videos/{id}/images |
 | `faceless videos delete` | Delete a video | DELETE /videos/{id} |
 | `faceless renders get` | Poll render progress | GET /renders/{id} |
 | `faceless series create` | Create an automated video series | POST /series |
@@ -70,6 +71,8 @@ If npm is unavailable, fall back to the raw HTTP API (see the last section).
 | `faceless voices` | List TTS voices | GET /voices |
 | `faceless options` | List content option catalogs | GET /options |
 | `faceless assets create` | Register a media asset by URL | POST /assets |
+| `faceless assets upload-image` | Upload your own image | POST /assets/images |
+| `faceless assets list` | List the team's media library | GET /assets |
 | `faceless analytics` | Cross-platform posting analytics | GET /analytics |
 | `faceless fast-track list` | List Fast Track video types, categories and scripts | GET /fast-track |
 | `faceless fast-track buy` | Get a Fast Track video | POST /fast-track |
