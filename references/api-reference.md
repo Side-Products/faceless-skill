@@ -969,6 +969,7 @@ Body fields:
 | `episodeTitleSeparator` | `hyphen` \| `em_dash` \| `pipe` \| `colon` | no | What joins the series title and the episode number: hyphen ("Title - Episode 1", the default), em_dash, pipe ("Title | Episode 1") or colon ("Title: Episode 1") |
 | `paused` | boolean | no | Pause or resume automatic episode generation |
 | `seasonEndsOn` | string | no | Season end: the last day (YYYY-MM-DD, in the series timezone) a new episode is scheduled for. No episode is made or charged for a later slot, episodes already made still post, and after the last one posts the series pauses itself with seasonFinished true. null removes the season end |
+| `seasonFinale` | boolean | no | Whether the last episode before the season end is written as a season finale that resolves the story (default true). false keeps its usual ending (a serial keeps its cliffhanger, for a story that continues elsewhere); scheduling still stops after seasonEndsOn. Needs a season end (sent with seasonEndsOn or already set) |
 
 Example:
 
