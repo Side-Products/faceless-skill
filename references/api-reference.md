@@ -56,7 +56,7 @@ Response:
 
 `GET /credits`
 
-Returns the team's current credit balance and a paginated ledger of credit transactions (purchases, subscription grants, video spends, refunds). Video creation charges credits at creation time; rendering and publishing are free. Costs: storyboard 20, motion_lite 50, motion_pro 100 credits per video.
+Returns the team's current credit balance and a paginated ledger of credit transactions (purchases, subscription grants, video spends, refunds). Video creation charges credits at creation time; rendering and publishing are free. Costs: storyboard 20 to 40 by length, motion_lite 60, motion_pro 120 credits per video.
 
 - Scopes: `credits:read`
 - Credits: none
@@ -154,7 +154,7 @@ Response:
 Creates an AI faceless video from a finished narration script: TTS voiceover, AI-generated visuals per scene, captions and optional background music. Generation is asynchronous; the response returns the video id immediately. Poll GET /videos/{id}/status until status is completed, then call POST /videos/{id}/render to produce the final MP4. Credits are charged now, at creation.
 
 - Scopes: `videos:write`
-- Credits: 20 credits (storyboard), 50 (motion_lite) or 100 (motion_pro) per video, charged at creation
+- Credits: 20 credits under 60 s, 30 for 60-89 s, 40 from 90 s (storyboard), 60 (motion_lite) or 120 (motion_pro) per video, charged at creation
 - Rate limit: 10 per 60s
 - Supports `Idempotency-Key` header
 - CLI: `faceless videos create`
@@ -166,7 +166,7 @@ Body fields:
 | --- | --- | --- | --- |
 | `script` | string | yes | The full narration script the video is generated from |
 | `voiceId` | string | yes | TTS voice id for the narration. Full list: GET /voices |
-| `model` | `storyboard` \| `motion_lite` \| `motion_pro` | no | Generation model: storyboard (20 credits, static scenes), motion_lite (50, animated transitions), motion_pro (100, cinematic) |
+| `model` | `storyboard` \| `motion_lite` \| `motion_pro` | no | Generation model: storyboard (20 credits under 60 s, 30 for 60-89 s, 40 from 90 s, static scenes), motion_lite (60, animated transitions), motion_pro (120, cinematic) |
 | `style` | string | no | Visual style for generated imagery. Full list: GET /options?kind=styles |
 | `language` | string | no | Script language, e.g. English. Full list: GET /options?kind=languages |
 | `name` | string | no | Project name; defaults to the start of the script |
@@ -251,7 +251,7 @@ Response:
 Creates an AI faceless video over a voiceover you recorded yourself: AI-generated visuals for every line, captions, and no AI voice. Pass a public link to the audio file; a Google Drive share link (set to "Anyone with the link") or a Dropbox link works as it is. Any common phone format (m4a, mp3, wav, ogg, webm) up to 90 seconds; it is levelled to narration loudness. The same art direction as POST /videos applies: style, masterStyle and globalNegativePrompt (a people ban, e.g. "people, hands, animals", keeps every frame free of them and each picture is checked). Pass the words you say as script so the captions spell them your way (recitation and names included). Music and sound effects follow the team's Video defaults unless set here. To show your own pictures (screenshots, photos) at chosen moments, pass images: each at a time or at words said, as an overlay card or full screen; the rest stays generated visuals (placing pictures costs nothing extra). Generation is asynchronous; poll GET /videos/{id}/status (it also reports which pictures were placed), then POST /videos/{id}/render, then schedule as usual. Credits are charged now, at creation, the same as POST /videos.
 
 - Scopes: `videos:write`
-- Credits: 20 credits (storyboard), 50 (motion_lite) or 100 (motion_pro) per video, charged at creation
+- Credits: 20 credits under 60 s, 30 for 60-89 s, 40 from 90 s (storyboard), 60 (motion_lite) or 120 (motion_pro) per video, charged at creation
 - Rate limit: 10 per 60s
 - Supports `Idempotency-Key` header
 - CLI: `faceless videos from-audio`
@@ -262,7 +262,7 @@ Body fields:
 | Name | Type | Required | Description |
 | --- | --- | --- | --- |
 | `audioUrl` | string | yes | Public link to your recording: a Google Drive share link ("Anyone with the link"), a Dropbox link or a direct file URL. Up to 90 seconds |
-| `model` | `storyboard` \| `motion_lite` \| `motion_pro` | no | Generation model: storyboard (20 credits, static scenes), motion_lite (50, animated transitions), motion_pro (100, cinematic) |
+| `model` | `storyboard` \| `motion_lite` \| `motion_pro` | no | Generation model: storyboard (20 credits under 60 s, 30 for 60-89 s, 40 from 90 s, static scenes), motion_lite (60, animated transitions), motion_pro (120, cinematic) |
 | `style` | string | no | Visual style for generated imagery. Full list: GET /options?kind=styles |
 | `masterStyle` | string | no | Extra style directive applied to every generated scene, e.g. "Nature landscapes only: mountains, rivers, sky at sunrise" |
 | `globalNegativePrompt` | string | no | Things never to show in any scene, e.g. "people, faces, hands, animals, birds, insects, buildings, text" |
