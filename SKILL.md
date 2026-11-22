@@ -41,6 +41,8 @@ If npm is unavailable, fall back to the raw HTTP API (see the last section).
 | Command | What it does | Endpoint |
 | --- | --- | --- |
 | `faceless whoami` | Identify the caller | GET /me |
+| `faceless defaults` | Read the team's video defaults | GET /video-defaults |
+| `faceless defaults set` | Set the team's video defaults | PATCH /video-defaults |
 | `faceless credits` | Credit balance and history | GET /credits |
 | `faceless buy-credits` | Buy a credit pack with an agent payment token | POST /credits |
 | `faceless videos create` | Create a faceless video from a script | POST /videos |

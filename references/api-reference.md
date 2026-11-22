@@ -50,6 +50,91 @@ Response:
 }
 ```
 
+## video-defaults
+
+### Read the team's video defaults
+
+`GET /video-defaults`
+
+Returns the team's standing defaults for every new video made one at a time (POST /videos, POST /videos/audio, the Create page): the picture rule every picture follows (off, nature, no_people_animals_text, or custom with the team's own words) and the caption style, size and weight. The picture rule is applied by Faceless on every video, so a request does not need to repeat it.
+
+- Scopes: `videos:read`
+- Credits: none
+- CLI: `faceless defaults`
+- MCP tool: `faceless_get_video_defaults`
+
+Example:
+
+```bash
+curl -s "https://faceless.so/api/v1/video-defaults" \
+  -H "Authorization: Bearer $FACELESS_API_KEY"
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "pictureRule": {
+      "mode": "custom",
+      "text": "1. Every scene matches the line being spoken.\n2. No faces.\n3. No text in images."
+    },
+    "captions": {
+      "theme": "IMAN",
+      "size": "extra_large",
+      "weight": "bold"
+    }
+  }
+}
+```
+
+### Set the team's video defaults
+
+`PATCH /video-defaults`
+
+Sets the team's defaults for every new video made one at a time, the same settings as Team settings > Video defaults. captions sets the caption style, size and weight (each part left out is unchanged; null resets captions to the product default); a video's own captions on create still win. pictureRule sets the rule every picture follows: mode off, nature, no_people_animals_text, or custom with text (the team's own words, up to 1,200 characters, stored as written). Every picture of every new video is checked against it, and a video with a picture that still breaks it waits for the team's review instead of posting. Free.
+
+- Scopes: `videos:write`
+- Credits: none
+- CLI: `faceless defaults set`
+- MCP tool: `faceless_update_video_defaults`
+
+Body fields:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `captions` | object | no | The default caption look. null resets it |
+| `pictureRule` | object | no | The picture rule every new video follows |
+
+Example:
+
+```bash
+curl -s -X PATCH "https://faceless.so/api/v1/video-defaults" \
+  -H "Authorization: Bearer $FACELESS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"captions":{"size":"extra_large","weight":"bold"}}'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "pictureRule": {
+      "mode": "off",
+      "text": null
+    },
+    "captions": {
+      "theme": null,
+      "size": "extra_large",
+      "weight": "bold"
+    }
+  }
+}
+```
+
 ## credits
 
 ### Credit balance and history
@@ -151,7 +236,7 @@ Response:
 
 `POST /videos`
 
-Creates an AI faceless video from a finished narration script: TTS voiceover, AI-generated visuals per scene, captions and optional background music. Generation is asynchronous; the response returns the video id immediately. Poll GET /videos/{id}/status until status is completed, then call POST /videos/{id}/render to produce the final MP4. Credits are charged now, at creation.
+Creates an AI faceless video from a finished narration script: TTS voiceover, AI-generated visuals per scene, captions and optional background music. Generation is asynchronous; the response returns the video id immediately. Poll GET /videos/{id}/status until status is completed, then call POST /videos/{id}/render to produce the final MP4. The team's picture rule (GET /video-defaults) applies to every picture without being repeated here, and the captions follow the team's default look unless captions is set. Credits are charged now, at creation.
 
 - Scopes: `videos:write`
 - Credits: 20 credits under 60 s, 30 for 60-89 s, 40 from 90 s (storyboard), 60 (motion_lite) or 120 (motion_pro) per video, charged at creation
@@ -174,6 +259,7 @@ Body fields:
 | `enableSoundEffects` | boolean | no | Automatic sound effects (whooshes, hits and an ambience bed). false makes a video with only the voice and any music. Omit to use the team's default (Team settings > Video defaults), else on |
 | `masterStyle` | string | no | Extra style directive applied to every generated scene |
 | `globalNegativePrompt` | string | no | Things the image model should avoid in every scene |
+| `captions` | object | no | This video's caption style, size and weight. Each part left out follows the team's default (Team settings > Video defaults > Captions, or faceless_update_video_defaults), else the product default |
 
 Example:
 
@@ -248,7 +334,7 @@ Response:
 
 `POST /videos/audio`
 
-Creates an AI faceless video over a voiceover you recorded yourself: AI-generated visuals for every line, captions, and no AI voice. Pass a public link to the audio file; a Google Drive share link (set to "Anyone with the link") or a Dropbox link works as it is. Any common phone format (m4a, mp3, wav, ogg, webm) up to 90 seconds; it is levelled to narration loudness. The same art direction as POST /videos applies: style, masterStyle and globalNegativePrompt (a people ban, e.g. "people, hands, animals", keeps every frame free of them and each picture is checked). Pass the words you say as script so the captions spell them your way (recitation and names included). Music and sound effects follow the team's Video defaults unless set here. To show your own pictures (screenshots, photos) at chosen moments, pass images: each at a time or at words said, as an overlay card or full screen; the rest stays generated visuals (placing pictures costs nothing extra). Generation is asynchronous; poll GET /videos/{id}/status (it also reports which pictures were placed), then POST /videos/{id}/render, then schedule as usual. Credits are charged now, at creation, the same as POST /videos.
+Creates an AI faceless video over a voiceover you recorded yourself: AI-generated visuals for every line, captions, and no AI voice. Pass a public link to the audio file; a Google Drive share link (set to "Anyone with the link") or a Dropbox link works as it is. Any common phone format (m4a, mp3, wav, ogg, webm) up to 90 seconds; it is levelled to narration loudness. The same art direction as POST /videos applies: style, masterStyle and globalNegativePrompt (a people ban, e.g. "people, hands, animals", keeps every frame free of them and each picture is checked). Pass the words you say as script so the captions spell them your way (recitation and names included). Music and sound effects follow the team's Video defaults unless set here, and so do the captions (style, size and weight; pass captions to choose for this video). The team's picture rule (GET /video-defaults) applies to every picture without being repeated here. To show your own pictures (screenshots, photos) at chosen moments, pass images: each at a time or at words said, as an overlay card or full screen; the rest stays generated visuals (placing pictures costs nothing extra). Generation is asynchronous; poll GET /videos/{id}/status (it also reports which pictures were placed), then POST /videos/{id}/render, then schedule as usual. Credits are charged now, at creation, the same as POST /videos.
 
 - Scopes: `videos:write`
 - Credits: 20 credits under 60 s, 30 for 60-89 s, 40 from 90 s (storyboard), 60 (motion_lite) or 120 (motion_pro) per video, charged at creation
@@ -272,6 +358,7 @@ Body fields:
 | `enableBackgroundMusic` | boolean | no | Mix background music under your voice. Omit to use the team's default (Team settings > Video defaults), else off |
 | `enableSoundEffects` | boolean | no | Sound effects on transitions. false keeps only your voice and any music. Omit to use the team's default (Team settings > Video defaults) |
 | `images` | array | no | Your own pictures shown at chosen moments, e.g. a client-review screenshot while you read it. Words in at/until must be in script when you pass one. Up to 20 |
+| `captions` | object | no | This video's caption style, size and weight. Each part left out follows the team's default (Team settings > Video defaults > Captions, or faceless_update_video_defaults), else the product default |
 
 Example:
 
