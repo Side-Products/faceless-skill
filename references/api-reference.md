@@ -56,7 +56,7 @@ Response:
 
 `GET /video-defaults`
 
-Returns the team's standing defaults for every new video made one at a time (POST /videos, POST /videos/audio, the Create page): the picture rule every picture follows (off, nature, no_people_animals_text, or custom with the team's own words) and the caption style, size and weight. The picture rule is applied by Faceless on every video, so a request does not need to repeat it.
+Returns the team's standing defaults for every new video made one at a time (POST /videos, POST /videos/audio, the Create page): the picture rule every picture follows (off, nature, no_people_animals_text, or custom with the team's own words), the caption style, size and weight, and imageBlur, the blur for the team's own pictures placed with faceless_place_images when a call does not say. The picture rule is applied by Faceless on every video, so a request does not need to repeat it.
 
 - Scopes: `videos:read`
 - Credits: none
@@ -84,7 +84,8 @@ Response:
       "theme": "IMAN",
       "size": "extra_large",
       "weight": "bold"
-    }
+    },
+    "imageBlur": "none"
   }
 }
 ```
@@ -93,7 +94,7 @@ Response:
 
 `PATCH /video-defaults`
 
-Sets the team's defaults for every new video made one at a time, the same settings as Team settings > Video defaults. captions sets the caption style, size and weight (each part left out is unchanged; null resets captions to the product default); a video's own captions on create still win. pictureRule sets the rule every picture follows: mode off, nature, no_people_animals_text, or custom with text (the team's own words, up to 1,200 characters, stored as written). Every picture of every new video is checked against it, and a video with a picture that still breaks it waits for the team's review instead of posting. Free.
+Sets the team's defaults for every new video made one at a time, the same settings as Team settings > Video defaults. captions sets the caption style, size and weight (each part left out is unchanged; null resets captions to the product default); a video's own captions on create still win. pictureRule sets the rule every picture follows: mode off, nature, no_people_animals_text, or custom with text (the team's own words, up to 1,200 characters, stored as written). Every picture of every new video is checked against it, and a video with a picture that still breaks it waits for the team's review instead of posting. imageBlur (none, light or strong) blurs the team's own pictures placed with faceless_place_images or faceless_create_video_from_audio images when neither the picture nor the call sets blur. Free.
 
 - Scopes: `videos:write`
 - Credits: none
@@ -106,6 +107,7 @@ Body fields:
 | --- | --- | --- | --- |
 | `captions` | object | no | The default caption look. null resets it |
 | `pictureRule` | object | no | The picture rule every new video follows |
+| `imageBlur` | `none` \| `light` \| `strong` | no | Default blur for the team's own placed pictures (faceless_place_images) when the call does not set blur. none (clear), light (softened: a stylistic blur; names, headings and most text can still be read) or strong (text, names and faces cannot be read; only colours and rough shapes remain). Use strong to hide names, faces or private details in a screenshot without editing it first |
 
 Example:
 
@@ -130,7 +132,8 @@ Response:
       "theme": null,
       "size": "extra_large",
       "weight": "bold"
-    }
+    },
+    "imageBlur": "none"
   }
 }
 ```
@@ -715,7 +718,7 @@ Response:
 
 `POST /videos/{id}/images`
 
-Shows your own pictures (screenshots, photos) in a video that has finished generating: each at a time or at words said in it, as an overlay card over the scene (whole picture visible, clear of the captions) or full screen. Images are ids from faceless_upload_image / faceless_list_assets or public links. Captions stay on top. replace: true first removes pictures placed earlier (to move or change them). Free: no credits and no AI generation. Then POST /videos/{id}/render for the MP4 and schedule as usual. Pictures whose words are not found are skipped and listed with the reason.
+Shows your own pictures (screenshots, photos) in a video that has finished generating: each at a time or at words said in it, as an overlay card over the scene (whole picture visible, clear of the captions) or full screen. Images are ids from faceless_upload_image / faceless_list_assets or public links. Captions stay on top. blur (light or strong, per picture or for the whole call) blurs a picture on screen, e.g. a screenshot with names or private details, with no editing beforehand; it can be changed later in the editor (Blur in the picture's settings). replace: true first removes pictures placed earlier (to move or change them). Free: no credits and no AI generation. Then POST /videos/{id}/render for the MP4 and schedule as usual. Pictures whose words are not found are skipped and listed with the reason.
 
 - Scopes: `videos:write`
 - Credits: none
@@ -729,6 +732,7 @@ Body fields:
 | --- | --- | --- | --- |
 | `images` | array | yes | The pictures and when and how each shows. Up to 20 |
 | `replace` | boolean | no | Remove the pictures placed earlier by this tool before placing these (default false: add to them) |
+| `blur` | `none` \| `light` \| `strong` | no | Blur for every picture in this call that does not set its own. none (clear), light (softened: a stylistic blur; names, headings and most text can still be read) or strong (text, names and faces cannot be read; only colours and rough shapes remain). Use strong to hide names, faces or private details in a screenshot without editing it first. Left out: the team's default (faceless_update_video_defaults imageBlur), else none |
 
 Example:
 
@@ -736,7 +740,7 @@ Example:
 curl -s -X POST "https://faceless.so/api/v1/videos/<id>/images" \
   -H "Authorization: Bearer $FACELESS_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"images":[{"image":"665f1b2a9c31a2b3c4d5ef02","at":"Sarah wrote to us","until":"best decision I made","mode":"overlay"},{"image":"665f1b2a9c31a2b3c4d5ef03","at":21.5,"duration":3,"mode":"fullscreen"}]}'
+  -d '{"images":[{"image":"665f1b2a9c31a2b3c4d5ef02","at":"Sarah wrote to us","until":"best decision I made","mode":"overlay","blur":"light"},{"image":"665f1b2a9c31a2b3c4d5ef03","at":21.5,"duration":3,"mode":"fullscreen"}]}'
 ```
 
 Response:
@@ -752,6 +756,7 @@ Response:
         "image": "665f1b2a9c31a2b3c4d5ef02",
         "mode": "overlay",
         "fit": "contain",
+        "blur": "light",
         "startSeconds": 8.42,
         "endSeconds": 14.1
       },
@@ -760,6 +765,7 @@ Response:
         "image": "665f1b2a9c31a2b3c4d5ef03",
         "mode": "fullscreen",
         "fit": "contain",
+        "blur": "none",
         "startSeconds": 21.5,
         "endSeconds": 24.5
       }
