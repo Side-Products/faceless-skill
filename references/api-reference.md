@@ -239,7 +239,7 @@ Response:
 
 `POST /videos`
 
-Creates an AI faceless video from a finished narration script: TTS voiceover, AI-generated visuals per scene, captions and optional background music. Generation is asynchronous; the response returns the video id immediately. Poll GET /videos/{id}/status until status is completed, then call POST /videos/{id}/render to produce the final MP4. The team's picture rule (GET /video-defaults) applies to every picture without being repeated here, and the captions follow the team's default look unless captions is set. Credits are charged now, at creation.
+Creates an AI faceless video from a finished narration script: TTS voiceover, AI-generated visuals per scene, captions and optional background music. Generation is asynchronous; the response returns the video id immediately. Poll GET /videos/{id}/status until status is completed, then call POST /videos/{id}/render to produce the final MP4. The team's picture rule (GET /video-defaults) applies to every picture without being repeated here, and the captions follow the team's default look unless captions is set. Credits are charged now, at creation, the same as in the app. A Storyboard video's length is read off the script, at about 2.5 words a second (the voiceover does not exist yet), so its price is known before you send it; the response's creditsUsed is the exact charge.
 
 - Scopes: `videos:write`
 - Credits: 20 credits under 60 s, 30 for 60-89 s, 40 from 90 s (storyboard), 60 (motion_lite) or 120 (motion_pro) per video, charged at creation

@@ -18,7 +18,7 @@ If `accounts` is empty, stop and tell the user to connect an account at https://
 ```bash
 faceless videos create --script "Did you know the ocean has lakes and rivers of its own? ..." \
   --voice-id EXAVITQu4vr4xnSDxMaL --model storyboard --json
-# charges credits now: storyboard 20, motion_lite 50, motion_pro 100
+# charges credits now: 20 credits under 60 s, 30 for 60-89 s, 40 from 90 s (storyboard), 60 (motion_lite) or 120 (motion_pro) per video, charged at creation
 
 faceless videos status <videoId> --json   # poll every 10-30s until status "completed"
 faceless videos render <videoId> --json   # returns renderId

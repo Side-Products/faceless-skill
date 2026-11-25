@@ -30,7 +30,7 @@ If npm is unavailable, fall back to the raw HTTP API (see the last section).
 ## Core concepts
 
 - A team owns credits, API keys and connected social accounts; every command runs in the key's team context (`faceless whoami` shows it).
-- Credits are charged at video creation time, by model: storyboard 20, motion_lite 50, motion_pro 100 credits per video. Rendering and publishing are free.
+- Credits are charged at video creation time, by model: 20 credits under 60 s, 30 for 60-89 s, 40 from 90 s (storyboard), 60 (motion_lite) or 120 (motion_pro) per video, charged at creation. A storyboard video's length is read off its script at about 2.5 words a second. Rendering and publishing are free.
 - Videos generate asynchronously: `videos create` returns an id immediately; poll `videos status` until completed, then `videos render` and poll `renders get` for the MP4 URL.
 - Series are set-and-forget channels: they generate and auto-post a new episode on their schedule, charging the per-episode model cost each time.
 - Scheduling to a platform requires that platform's post metadata on the video first (`videos update`), and a connected account (`faceless accounts`).
