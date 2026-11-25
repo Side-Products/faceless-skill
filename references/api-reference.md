@@ -293,7 +293,7 @@ Response:
 
 `POST /videos/captions`
 
-Creates a project from a video or audio URL you already have: transcribes it, adds styled captions and emojis, and makes it editable. Use this to caption existing footage rather than generate new AI visuals (for that, use POST /videos). Processing is asynchronous; poll GET /videos/{id}/status.
+Creates a project from a video or audio URL you already have: transcribes it, adds styled captions and emojis, and makes it editable. Use this to caption existing footage, e.g. a video of you talking to the camera, rather than generate new AI visuals (for that, use POST /videos). Files up to 30 minutes long; it uses no credits. Processing is asynchronous; poll GET /videos/{id}/status.
 
 - Scopes: `videos:write`
 - Credits: none
@@ -337,10 +337,10 @@ Response:
 
 `POST /videos/audio`
 
-Creates an AI faceless video over a voiceover you recorded yourself: AI-generated visuals for every line, captions, and no AI voice. Pass a public link to the audio file; a Google Drive share link (set to "Anyone with the link") or a Dropbox link works as it is. Any common phone format (m4a, mp3, wav, ogg, webm) up to 90 seconds; it is levelled to narration loudness. The same art direction as POST /videos applies: style, masterStyle and globalNegativePrompt (a people ban, e.g. "people, hands, animals", keeps every frame free of them and each picture is checked). Pass the words you say as script so the captions spell them your way (recitation and names included). Music and sound effects follow the team's Video defaults unless set here, and so do the captions (style, size and weight; pass captions to choose for this video). The team's picture rule (GET /video-defaults) applies to every picture without being repeated here. To show your own pictures (screenshots, photos) at chosen moments, pass images: each at a time or at words said, as an overlay card or full screen; the rest stays generated visuals (placing pictures costs nothing extra). Generation is asynchronous; poll GET /videos/{id}/status (it also reports which pictures were placed), then POST /videos/{id}/render, then schedule as usual. Credits are charged now, at creation, the same as POST /videos.
+Creates an AI faceless video over a voiceover you recorded yourself: AI-generated visuals for every line, captions, and no AI voice. Pass a public link to the audio file; a Google Drive share link (set to "Anyone with the link") or a Dropbox link works as it is. Any common phone format (m4a, mp3, wav, ogg, webm) up to 10 minutes; it is levelled to narration loudness. The same art direction as POST /videos applies: style, masterStyle and globalNegativePrompt (a people ban, e.g. "people, hands, animals", keeps every frame free of them and each picture is checked). Pass the words you say as script so the captions spell them your way (recitation and names included). Music and sound effects follow the team's Video defaults unless set here, and so do the captions (style, size and weight; pass captions to choose for this video). The team's picture rule (GET /video-defaults) applies to every picture without being repeated here. To show your own pictures (screenshots, photos) at chosen moments, pass images: each at a time or at words said, as an overlay card or full screen; the rest stays generated visuals (placing pictures costs nothing extra). Generation is asynchronous; poll GET /videos/{id}/status (it also reports which pictures were placed), then POST /videos/{id}/render, then schedule as usual. Credits are charged now, at creation: up to 90 seconds the same as POST /videos; a longer recording costs the model's price for every started minute (Storyboard: 2 minutes 40 credits, 3 minutes 60, 10 minutes 200).
 
 - Scopes: `videos:write`
-- Credits: 20 credits under 60 s, 30 for 60-89 s, 40 from 90 s (storyboard), 60 (motion_lite) or 120 (motion_pro) per video, charged at creation
+- Credits: 20 credits under 60 s, 30 for 60-89 s, 40 from 90 s (storyboard), 60 (motion_lite) or 120 (motion_pro) per video up to 90 seconds; a longer recording (up to 10 minutes) costs that price for every started minute. Charged at creation
 - Rate limit: 10 per 60s
 - Supports `Idempotency-Key` header
 - CLI: `faceless videos from-audio`
@@ -350,7 +350,7 @@ Body fields:
 
 | Name | Type | Required | Description |
 | --- | --- | --- | --- |
-| `audioUrl` | string | yes | Public link to your recording: a Google Drive share link ("Anyone with the link"), a Dropbox link or a direct file URL. Up to 90 seconds |
+| `audioUrl` | string | yes | Public link to your recording: a Google Drive share link ("Anyone with the link"), a Dropbox link or a direct file URL. Up to 10 minutes (over 90 seconds is charged per started minute) |
 | `model` | `storyboard` \| `motion_lite` \| `motion_pro` | no | Generation model: storyboard (20 credits under 60 s, 30 for 60-89 s, 40 from 90 s, static scenes), motion_lite (60, animated transitions), motion_pro (120, cinematic) |
 | `style` | string | no | Visual style for generated imagery. Full list: GET /options?kind=styles |
 | `masterStyle` | string | no | Extra style directive applied to every generated scene, e.g. "Nature landscapes only: mountains, rivers, sky at sunrise" |
@@ -2000,6 +2000,154 @@ Response:
     "createdAt": "2026-10-21T18:13:00.000Z",
     "creditsUsed": 10,
     "statusUrl": "/api/v1/videos/665f1b2a9c31a2b3c4d5ea01/status"
+  }
+}
+```
+
+## edits
+
+### Edit your own video with the AI Video Editor
+
+`POST /edits`
+
+Edits a video you recorded yourself (a talking head, a podcast clip, a vlog, a product demo) into a finished video, the way a human editor would: it removes silences, umms and false starts by the words you say, keeps your face and voice in sync, frames your face (vertical or landscape) with punch-ins on the lines that land, puts a bold hook line on screen in the first 2 seconds, word-by-word captions in your caption style, AI scenery cutaways over your footage while your voice keeps playing (drawn under your team's picture rule and negative prompt; still pictures with a camera move unless motionCutaways is true), and your brand bar, intro and end card from your brief and brand kit. Pass a public link to the video: a Google Drive share link set to "Anyone with the link", a Dropbox link or a direct file URL (MP4 or MOV, up to 10 minutes, up to 3 GB). Say in brief what you want: your hook line, where cutaways go (by time in your video, "at 0:45", or by the words you say, "when I say peace"), how many, your business name, a call to action. Pictures to show (your logo, client review screenshots, blurred with your team's picture blur) go in imageUrls. The video is fetched in the background: poll GET /edits/{id} until status is ready (it returns the finished film's URL and the project id to open it in the editor) or failed. Credits are charged when the fetched video starts editing: per second of your video at 1 credit (1.5 on the newer pricing), plus 3 credits per AI cutaway (14 for moving ones); cutaways left to the editor are priced at about one per 30 seconds of video, 2 to 12. Nothing is charged if the link cannot be fetched.
+
+- Scopes: `videos:write`
+- Credits: 1 credit per second of your video (1.5 on the newer pricing) plus 3 per AI cutaway (14 moving), charged when the video starts editing; a change to a finished edit is 35% of that
+- Rate limit: 6 per 300s
+- Supports `Idempotency-Key` header
+- CLI: `faceless edits create`
+- MCP tool: `faceless_edit_video`
+
+Body fields:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `videoUrl` | string | yes | Public link to your video: a Google Drive share link ("Anyone with the link"), a Dropbox link or a direct file URL. MP4 or MOV, up to 10 minutes |
+| `videoUrls` | array | no | More videos to edit together (more takes, your own b-roll), in order. Up to 6 in all, 10 minutes in all |
+| `brief` | string | yes | How to edit it, in your words: the hook line, where the cutaways go ("at 0:45", "when I say peace"), what they show, your business name for the brand bar, the call to action for the end card. The editor follows it; where you say nothing it chooses |
+| `preset` | `talking-head` \| `podcast-clips` \| `vlog` \| `product-demo` \| `shorts-from-long` | no | What kind of footage it is: talking-head (default), podcast-clips (the best moment as a clip), vlog, product-demo, shorts-from-long (the best moment as a vertical Short) |
+| `aspect` | `9:16` \| `16:9` \| `1:1` \| `4:5` \| `auto` | no | The finished video's shape. auto (default) keeps your video's own; 9:16 from landscape footage is cropped around your face |
+| `cutaways` | integer | no | How many AI cutaways. 0 keeps your face on screen throughout; omit to let the editor choose (priced at about one per 30 s of video) |
+| `motionCutaways` | boolean | no | Moving cutaways (short generated clips) instead of still pictures with a camera move. 14 credits each instead of 3 |
+| `music` | boolean | no | A quiet music bed under your voice. Off by default |
+| `captions` | string | no | A caption theme for this video (GET /options?kind=captionThemes). Omit to use the team's caption style (GET /video-defaults) |
+| `imageUrls` | array | no | Pictures to use: your logo, client review screenshots to show as overlays. Public links, up to 15 MB each |
+
+Example:
+
+```bash
+curl -s -X POST "https://faceless.so/api/v1/edits" \
+  -H "Authorization: Bearer $FACELESS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"videoUrl":"https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz012345/view?usp=sharing","brief":"Edit my talking video for Reels. Hook line: 'Stress is not your enemy'. Cut the pauses and umms, zoom in when I make a point, put calm sea scenery when I say peace and at 1:10, keep my face at the start and the end, brand bar with Muslim Stress Management Mastery, end card: book a free call.","preset":"talking-head","aspect":"9:16","cutaways":4}'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "6b0412a9c31a2b3c4d5e8f01",
+    "status": "importing",
+    "headline": "Fetching your video. Nothing is charged until it is in.",
+    "error": null,
+    "creditsCharged": 0,
+    "filmUrl": null,
+    "posterUrl": null,
+    "projectId": null,
+    "studioUrl": null,
+    "statusUrl": "/api/v1/edits/6b0412a9c31a2b3c4d5e8f01"
+  }
+}
+```
+
+### Follow an AI Video Editor job
+
+`GET /edits/{id}`
+
+Returns where an edit is: importing (the video is being fetched; nothing charged yet), queued, editing (the editor is cutting it; headline says what it is doing), rendering, ready (filmUrl is the finished MP4, projectId opens it in the editor, studioUrl shows it in the studio) or failed (error says why; a failed edit is refunded). revising while a change you asked for is being made. Poll every 30-60 seconds: an edit takes about 20 to 60 minutes.
+
+- Scopes: `videos:read`
+- Credits: none
+- Terminal states: `ready`, `failed`
+- CLI: `faceless edits get`
+- MCP tool: `faceless_get_edit`
+
+Example:
+
+```bash
+curl -s "https://faceless.so/api/v1/edits/<id>" \
+  -H "Authorization: Bearer $FACELESS_API_KEY"
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "6b0412a9c31a2b3c4d5e8f01",
+    "runId": "6b0412b0c31a2b3c4d5e8f09",
+    "status": "ready",
+    "headline": "Your edit is ready.",
+    "error": null,
+    "title": "Stress Is Not Your Enemy",
+    "filmUrl": "https://exports.faceless.so/motion-director/6b0412b0c31a2b3c4d5e8f09/t1/k2j3-film.mp4",
+    "posterUrl": "https://exports.faceless.so/motion-director/6b0412b0c31a2b3c4d5e8f09/t1/k2j3-poster.jpg",
+    "seconds": 108.4,
+    "version": 1,
+    "projectId": "6b0412b0c31a2b3c4d5e8f0a",
+    "creditsCharged": 132,
+    "changeCredits": 46,
+    "studioUrl": "https://faceless.so/motion-director/6b0412b0c31a2b3c4d5e8f09"
+  }
+}
+```
+
+### Ask for a change to an edit
+
+`POST /edits/{id}/notes`
+
+Sends a note to the editor. While the edit is being made it is free and the editor folds it in. Once the edit is ready it asks for a change (a new version of the same film), charged at changeCredits from GET /edits/{id} (35% of the edit's price). Then poll GET /edits/{id} again.
+
+- Scopes: `videos:write`
+- Credits: none while the edit is being made; a change to a finished edit is 35% of its price (changeCredits)
+- Rate limit: 10 per 300s
+- Supports `Idempotency-Key` header
+- CLI: `faceless edits change`
+- MCP tool: `faceless_change_edit`
+
+Body fields:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `text` | string | yes | What to change, e.g. "make the hook line bigger and use a forest instead of the sea at 0:45" |
+
+Example:
+
+```bash
+curl -s -X POST "https://faceless.so/api/v1/edits/<id>/notes" \
+  -H "Authorization: Bearer $FACELESS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Make the hook line bigger and use a forest instead of the sea at 0:45."}'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "6b0412a9c31a2b3c4d5e8f01",
+    "runId": "6b0412b0c31a2b3c4d5e8f09",
+    "status": "revising",
+    "headline": "Waiting for the studio.",
+    "error": null,
+    "revision": true,
+    "creditsCharged": 46,
+    "studioUrl": "https://faceless.so/motion-director/6b0412b0c31a2b3c4d5e8f09"
   }
 }
 ```

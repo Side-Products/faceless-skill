@@ -78,6 +78,9 @@ If npm is unavailable, fall back to the raw HTTP API (see the last section).
 | `faceless analytics` | Cross-platform posting analytics | GET /analytics |
 | `faceless fast-track list` | List Fast Track video types, categories and scripts | GET /fast-track |
 | `faceless fast-track buy` | Get a Fast Track video | POST /fast-track |
+| `faceless edits create` | Edit your own video with the AI Video Editor | POST /edits |
+| `faceless edits get` | Follow an AI Video Editor job | GET /edits/{id} |
+| `faceless edits change` | Ask for a change to an edit | POST /edits/{id}/notes |
 | `faceless ads search` | Search Meta ads shown in the EU and UK | GET /ads/search |
 | `faceless ads saved` | List the team's saved ads | GET /saved-ads |
 | `faceless ads save` | Save an ad from a search | POST /saved-ads |
