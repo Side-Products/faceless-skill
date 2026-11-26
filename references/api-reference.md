@@ -263,6 +263,7 @@ Body fields:
 | `masterStyle` | string | no | Extra style directive applied to every generated scene |
 | `globalNegativePrompt` | string | no | Things the image model should avoid in every scene |
 | `captions` | object | no | This video's caption style, size and weight. Each part left out follows the team's default (Team settings > Video defaults > Captions, or faceless_update_video_defaults), else the product default |
+| `logo` | boolean | no | true opens the video on the team's brand kit logo for its first 1.2 seconds and closes on it for its last 1.8 seconds, over the video (the voice, captions and cuts keep their timing). Needs a logo in a brand kit (add one at faceless.so/brand-kits); without one the call fails before anything is charged. Omit or false for no logo intro and outro. It can be switched on or off later with POST /videos/{id}/render logo, or in the editor |
 
 Example:
 
@@ -362,6 +363,7 @@ Body fields:
 | `enableSoundEffects` | boolean | no | Sound effects on transitions. false keeps only your voice and any music. Omit to use the team's default (Team settings > Video defaults) |
 | `images` | array | no | Your own pictures shown at chosen moments, e.g. a client-review screenshot while you read it. Words in at/until must be in script when you pass one. Up to 20 |
 | `captions` | object | no | This video's caption style, size and weight. Each part left out follows the team's default (Team settings > Video defaults > Captions, or faceless_update_video_defaults), else the product default |
+| `logo` | boolean | no | true opens the video on the team's brand kit logo for its first 1.2 seconds and closes on it for its last 1.8 seconds, over the video (the voice, captions and cuts keep their timing). Needs a logo in a brand kit (add one at faceless.so/brand-kits); without one the call fails before anything is charged. Omit or false for no logo intro and outro. It can be switched on or off later with POST /videos/{id}/render logo, or in the editor |
 
 Example:
 
@@ -692,6 +694,7 @@ Body fields:
 | Name | Type | Required | Description |
 | --- | --- | --- | --- |
 | `codec` | `h264` \| `vp8` | no | Output codec; h264 for MP4 (default) |
+| `logo` | boolean | no | Switch the logo intro and outro on (true) or off (false) for this video before it renders: the team's brand kit logo over the first 1.2 s and the last 1.8 s, on top of the video, so the voice and captions keep their timing. Saved with the video. Omit to keep the video as it is |
 
 Example:
 
