@@ -56,7 +56,7 @@ Response:
 
 `GET /video-defaults`
 
-Returns the team's standing defaults for every new video made one at a time (POST /videos, POST /videos/audio, the Create page): the picture rule every picture follows (off, nature, no_people_animals_text, or custom with the team's own words), the caption style, size and weight, and imageBlur, the blur for the team's own pictures placed with faceless_place_images when a call does not say. The picture rule is applied by Faceless on every video, so a request does not need to repeat it.
+Returns the team's standing defaults for every new video made one at a time (POST /videos, POST /videos/audio, the Create page): the picture rule every picture follows (off, nature, no_people_animals_text, or custom with the team's own words), the caption style, size and weight, imageBlur, the blur for the team's own pictures placed with faceless_place_images when a call does not say, and perPlatformCaptions, whether AI writes a different caption for each platform by default (new series and the editor's Post tab start from it). The picture rule is applied by Faceless on every video, so a request does not need to repeat it.
 
 - Scopes: `videos:read`
 - Credits: none
@@ -85,7 +85,8 @@ Response:
       "size": "extra_large",
       "weight": "bold"
     },
-    "imageBlur": "none"
+    "imageBlur": "none",
+    "perPlatformCaptions": false
   }
 }
 ```
@@ -94,7 +95,7 @@ Response:
 
 `PATCH /video-defaults`
 
-Sets the team's defaults for every new video made one at a time, the same settings as Team settings > Video defaults. captions sets the caption style, size and weight (each part left out is unchanged; null resets captions to the product default); a video's own captions on create still win. pictureRule sets the rule every picture follows: mode off, nature, no_people_animals_text, or custom with text (the team's own words, up to 1,200 characters, stored as written). Every picture of every new video is checked against it, and a video with a picture that still breaks it waits for the team's review instead of posting. imageBlur (none, light or strong) blurs the team's own pictures placed with faceless_place_images or faceless_create_video_from_audio images when neither the picture nor the call sets blur. Free.
+Sets the team's defaults for every new video made one at a time, the same settings as Team settings > Video defaults. captions sets the caption style, size and weight (each part left out is unchanged; null resets captions to the product default); a video's own captions on create still win. pictureRule sets the rule every picture follows: mode off, nature, no_people_animals_text, or custom with text (the team's own words, up to 1,200 characters, stored as written). Every picture of every new video is checked against it, and a video with a picture that still breaks it waits for the team's review instead of posting. imageBlur (none, light or strong) blurs the team's own pictures placed with faceless_place_images or faceless_create_video_from_audio images when neither the picture nor the call sets blur. perPlatformCaptions false turns Different caption for each platform off by default: new series start with it off and the editor's Post tab of a video that does not choose keeps every platform on the video's one caption or the captions set with faceless_set_video_captions (true turns it back on). Free.
 
 - Scopes: `videos:write`
 - Credits: none
@@ -108,6 +109,7 @@ Body fields:
 | `captions` | object | no | The default caption look. null resets it |
 | `pictureRule` | object | no | The picture rule every new video follows |
 | `imageBlur` | `none` \| `light` \| `strong` | no | Default blur for the team's own placed pictures (faceless_place_images) when the call does not set blur. none (clear), light (softened: a stylistic blur; names, headings and most text can still be read) or strong (text, names and faces cannot be read; only colours and rough shapes remain). Use strong to hide names, faces or private details in a screenshot without editing it first |
+| `perPlatformCaptions` | boolean | no | The team default for "Different caption for each platform": true (the product default), AI writes a different hook and caption for each platform; false, it is off for every new series and in the editor's Post tab of every video that does not choose, so each platform posts the video's one caption or the captions set with faceless_set_video_captions. Existing series keep their own setting (faceless_update_series perPlatformCaptions) |
 
 Example:
 
@@ -133,7 +135,8 @@ Response:
       "size": "extra_large",
       "weight": "bold"
     },
-    "imageBlur": "none"
+    "imageBlur": "none",
+    "perPlatformCaptions": true
   }
 }
 ```
@@ -263,7 +266,7 @@ Body fields:
 | `masterStyle` | string | no | Extra style directive applied to every generated scene |
 | `globalNegativePrompt` | string | no | Things the image model should avoid in every scene |
 | `captions` | object | no | This video's caption style, size and weight. Each part left out follows the team's default (Team settings > Video defaults > Captions, or faceless_update_video_defaults), else the product default |
-| `logo` | boolean | no | true opens the video on the team's brand kit logo for its first 1.2 seconds and closes on it for its last 1.8 seconds, over the video (the voice, captions and cuts keep their timing). Needs a logo in a brand kit (add one at faceless.so/brand-kits); without one the call fails before anything is charged. Omit or false for no logo intro and outro. It can be switched on or off later with POST /videos/{id}/render logo, or in the editor |
+| `logo` | mixed | no | true puts the team's brand kit logo at both ends: over the first 1.2 seconds (the start) and the last 1.8 seconds (the end), on top of the video, so the voice, captions and cuts keep their timing. { start, end } switches each end on its own: { start: false, end: true } is the end only and keeps the opening clear, { start: true, end: false } the start only (a part left out is off). false is neither. Needs a logo in a brand kit (add one at faceless.so/brand-kits); without one the call fails before anything is charged. Omit for no logo. It can be changed later with POST /videos/{id}/render logo, or in the editor (Brand Kit > Logo at the start / Logo at the end) |
 
 Example:
 
@@ -363,7 +366,7 @@ Body fields:
 | `enableSoundEffects` | boolean | no | Sound effects on transitions. false keeps only your voice and any music. Omit to use the team's default (Team settings > Video defaults) |
 | `images` | array | no | Your own pictures shown at chosen moments, e.g. a client-review screenshot while you read it. Words in at/until must be in script when you pass one. Up to 20 |
 | `captions` | object | no | This video's caption style, size and weight. Each part left out follows the team's default (Team settings > Video defaults > Captions, or faceless_update_video_defaults), else the product default |
-| `logo` | boolean | no | true opens the video on the team's brand kit logo for its first 1.2 seconds and closes on it for its last 1.8 seconds, over the video (the voice, captions and cuts keep their timing). Needs a logo in a brand kit (add one at faceless.so/brand-kits); without one the call fails before anything is charged. Omit or false for no logo intro and outro. It can be switched on or off later with POST /videos/{id}/render logo, or in the editor |
+| `logo` | mixed | no | true puts the team's brand kit logo at both ends: over the first 1.2 seconds (the start) and the last 1.8 seconds (the end), on top of the video, so the voice, captions and cuts keep their timing. { start, end } switches each end on its own: { start: false, end: true } is the end only and keeps the opening clear, { start: true, end: false } the start only (a part left out is off). false is neither. Needs a logo in a brand kit (add one at faceless.so/brand-kits); without one the call fails before anything is charged. Omit for no logo. It can be changed later with POST /videos/{id}/render logo, or in the editor (Brand Kit > Logo at the start / Logo at the end) |
 
 Example:
 
@@ -541,7 +544,7 @@ Response:
 
 `PATCH /videos/{id}`
 
-Updates a video's name and/or its per-platform post metadata (titles, captions, descriptions). Set the metadata for every platform you intend to schedule to BEFORE calling POST /posts/schedule; scheduling rejects platforms whose metadata is missing.
+Updates a video's name and/or its per-platform post metadata (titles, captions, descriptions). Set the metadata for every platform you intend to schedule to BEFORE calling POST /posts/schedule; scheduling rejects platforms whose metadata is missing. A caption set here posts exactly as written, as with PATCH /videos/{id}/captions (faceless_set_video_captions), which is the simpler way to set every platform's caption at once, also on a series episode waiting for its slot.
 
 - Scopes: `videos:write`
 - Credits: none
@@ -588,6 +591,121 @@ Response:
       "variants": [
         "https://exports.faceless.so/thumbnails/665f1b2a9c31a2b3c4d5e801/a.jpg"
       ]
+    }
+  }
+}
+```
+
+### Read what each platform posts for a video
+
+`GET /videos/{id}/captions`
+
+Returns, per platform, the caption this video posts with: text (YouTube: title and description) and writtenBy: "you" (set with faceless_set_video_captions or edited in the editor, posted exactly as written), "ai" (written by "Different caption for each platform") or "shared" (the video's one caption). perPlatformCaptions says whether AI writes a caption for each platform for this video (on), where that comes from (video, series or team) and the video's own choice (video, null when it follows its series or team). Works for one-off videos and series episodes.
+
+- Scopes: `videos:read`
+- Credits: none
+- CLI: `faceless videos get-captions`
+- MCP tool: `faceless_get_video_captions`
+
+Example:
+
+```bash
+curl -s "https://faceless.so/api/v1/videos/<id>/captions" \
+  -H "Authorization: Bearer $FACELESS_API_KEY"
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "665f1b2a9c31a2b3c4d5e801",
+    "perPlatformCaptions": {
+      "on": false,
+      "from": "team",
+      "video": null
+    },
+    "platforms": {
+      "tiktok": {
+        "text": "Feel like nothing comes together? #islam #sunnah",
+        "writtenBy": "you"
+      },
+      "youtube": {
+        "title": "When life feels scattered",
+        "description": "What the Prophet said about a scattered life. #shorts",
+        "writtenBy": "you"
+      },
+      "instagram": {
+        "text": "Save this for the days your life feels scattered. #islam",
+        "writtenBy": "you"
+      }
+    }
+  }
+}
+```
+
+### Set each platform's caption for a video, posted exactly as written
+
+`PATCH /videos/{id}/captions`
+
+Sets a video's caption for each platform (TikTok, YouTube title and description, Instagram, Facebook, X, Threads, LinkedIn), stored on the video and posted exactly as written: Faceless never rewrites them with AI, adds hashtags or applies a series' caption rules. Use it before POST /posts (which then posts the stored caption when you pass no title), before POST /posts/schedule, or on a video already scheduled: a series episode waiting for its slot, or a video scheduled earlier, posts the new captions at its time (find an episode's videoId with GET /series/{id}/episodes or GET /calendar once it is made). A platform that already posted this video is left alone and listed in alreadyPosted. Platform policy still applies: a product ad's TikTok caption loses off-platform shop links and prices (listed in adjusted), and Instagram's hashtag and mention limits are checked. perPlatformCaptions sets the video's own "Different caption for each platform" switch. Free.
+
+- Scopes: `videos:write`
+- Credits: none
+- CLI: `faceless videos set-captions`
+- MCP tool: `faceless_set_video_captions`
+
+Body fields:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `captions` | object | no | Each platform's caption, exactly as it should post: the whole text with its hashtags, written to your own rules. Faceless never rewrites it: no AI, no hashtags added, no series caption rules. Only platform policy still applies: a product ad's TikTok caption loses off-platform shop links and prices (the answer says so), Instagram's 30-hashtag and 20-mention limits are checked, and a paid Earn sponsor block (#ad) the post carries stays at the top. Platforms left out keep what they have |
+| `perPlatformCaptions` | boolean | no | This video's "Different caption for each platform" switch: true lets AI write a different hook and caption for each platform (in the editor's Post tab, and for a series episode when it is finished), false turns that off so every platform posts the video's one caption or the captions you set here. null clears the video's own choice, so it follows its series, else the team default (faceless_update_video_defaults perPlatformCaptions). Captions you set here are never replaced either way |
+
+Example:
+
+```bash
+curl -s -X PATCH "https://faceless.so/api/v1/videos/<id>/captions" \
+  -H "Authorization: Bearer $FACELESS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"captions":{"tiktok":"Feel like nothing comes together? 🤍\n\nDM me PEACE on Instagram for my free guide.\n\n#islam #sunnah #hadith","youtube":{"title":"When life feels scattered","description":"What the Prophet said about a scattered life.\n\n#shorts #islam"},"instagram":"Save this for the days your life feels scattered 🤍\n\nDM me PEACE for my free guide.\n\n#islam #sunnah"},"perPlatformCaptions":false}'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "665f1b2a9c31a2b3c4d5e801",
+    "stored": [
+      "tiktok",
+      "youtube",
+      "instagram"
+    ],
+    "alreadyPosted": [],
+    "adjusted": {},
+    "scheduledPostsUpdated": 0,
+    "perPlatformCaptions": {
+      "on": false,
+      "from": "video",
+      "video": false
+    },
+    "platforms": {
+      "tiktok": {
+        "text": "Feel like nothing comes together? 🤍\n\nDM me PEACE on Instagram for my free guide.\n\n#islam #sunnah #hadith",
+        "writtenBy": "you"
+      },
+      "youtube": {
+        "title": "When life feels scattered",
+        "description": "What the Prophet said about a scattered life.\n\n#shorts #islam",
+        "writtenBy": "you"
+      },
+      "instagram": {
+        "text": "Save this for the days your life feels scattered 🤍\n\nDM me PEACE for my free guide.\n\n#islam #sunnah",
+        "writtenBy": "you"
+      }
     }
   }
 }
@@ -694,7 +812,7 @@ Body fields:
 | Name | Type | Required | Description |
 | --- | --- | --- | --- |
 | `codec` | `h264` \| `vp8` | no | Output codec; h264 for MP4 (default) |
-| `logo` | boolean | no | Switch the logo intro and outro on (true) or off (false) for this video before it renders: the team's brand kit logo over the first 1.2 s and the last 1.8 s, on top of the video, so the voice and captions keep their timing. Saved with the video. Omit to keep the video as it is |
+| `logo` | mixed | no | Change the logo intro and outro of this video before it renders. true puts the team's brand kit logo at both ends: over the first 1.2 seconds (the start) and the last 1.8 seconds (the end), on top of the video, so the voice, captions and cuts keep their timing. { start, end } switches each end on its own: { start: false, end: true } is the end only and keeps the opening clear, { start: true, end: false } the start only (a part left out is off). false is neither. Saved with the video. Omit to keep the video as it is |
 
 Example:
 
@@ -902,6 +1020,8 @@ Body fields:
 | `tiktokAllowComments` | boolean | no | Allow comments on auto-posted TikTok posts; defaults to true. An account that has comments disabled in TikTok posts with them off |
 | `tiktokAllowDuet` | boolean | no | Allow other accounts to Duet auto-posted TikTok posts; defaults to true. An account that has Duet disabled in TikTok posts with it off |
 | `tiktokAllowStitch` | boolean | no | Allow other accounts to Stitch auto-posted TikTok posts; defaults to true. An account that has Stitch disabled in TikTok posts with it off |
+| `perPlatformCaptions` | boolean | no | "Different caption for each platform" for every new episode: true, AI writes a different hook and caption for each platform the episode posts to (TikTok, YouTube title and description, Instagram, Facebook, X, Threads, LinkedIn); false, every platform posts the episode's one caption. Omitted on create: the team default (faceless_update_video_defaults perPlatformCaptions). Either way, captions set on an episode with faceless_set_video_captions before it posts are posted exactly as written |
+| `logo` | mixed | no | The logo intro and outro on every new episode. true puts the team's brand kit logo at both ends: over the first 1.2 seconds (the start) and the last 1.8 seconds (the end), on top of the video, so the voice, captions and cuts keep their timing. { start, end } switches each end on its own: { start: false, end: true } is the end only and keeps the opening clear, { start: true, end: false } the start only (a part left out is off). false is neither. The logo is the series' brand kit's, else the team's brand kit logo; without a logo anywhere the request is refused |
 | `episodeTitleMode` | `unique` \| `series_numbered` | no | How episodes are titled when they post. "unique" (the default): every episode posts its own title. "series_numbered": every episode posts as "<seriesDisplayTitle> - Episode N" on YouTube, and every other platform's caption opens with that line above the episode's usual caption. N is the episode's place in a serial (Micro Drama) or the next number of the series, and never changes once an episode is made |
 | `seriesDisplayTitle` | string | no | The series title numbered episodes carry. Empty uses a serial's own story title, then the series name |
 | `episodeTitleSeparator` | `hyphen` \| `em_dash` \| `pipe` \| `colon` | no | What joins the series title and the episode number: hyphen ("Title - Episode 1", the default), em_dash, pipe ("Title | Episode 1") or colon ("Title: Episode 1") |
@@ -1060,6 +1180,8 @@ Body fields:
 | `tiktokAllowComments` | boolean | no | Allow comments on auto-posted TikTok posts; defaults to true. An account that has comments disabled in TikTok posts with them off |
 | `tiktokAllowDuet` | boolean | no | Allow other accounts to Duet auto-posted TikTok posts; defaults to true. An account that has Duet disabled in TikTok posts with it off |
 | `tiktokAllowStitch` | boolean | no | Allow other accounts to Stitch auto-posted TikTok posts; defaults to true. An account that has Stitch disabled in TikTok posts with it off |
+| `perPlatformCaptions` | boolean | no | "Different caption for each platform" for every new episode: true, AI writes a different hook and caption for each platform the episode posts to (TikTok, YouTube title and description, Instagram, Facebook, X, Threads, LinkedIn); false, every platform posts the episode's one caption. Omitted on create: the team default (faceless_update_video_defaults perPlatformCaptions). Either way, captions set on an episode with faceless_set_video_captions before it posts are posted exactly as written |
+| `logo` | mixed | no | The logo intro and outro on every new episode. true puts the team's brand kit logo at both ends: over the first 1.2 seconds (the start) and the last 1.8 seconds (the end), on top of the video, so the voice, captions and cuts keep their timing. { start, end } switches each end on its own: { start: false, end: true } is the end only and keeps the opening clear, { start: true, end: false } the start only (a part left out is off). false is neither. The logo is the series' brand kit's, else the team's brand kit logo; without a logo anywhere the request is refused |
 | `episodeTitleMode` | `unique` \| `series_numbered` | no | How episodes are titled when they post. "unique" (the default): every episode posts its own title. "series_numbered": every episode posts as "<seriesDisplayTitle> - Episode N" on YouTube, and every other platform's caption opens with that line above the episode's usual caption. N is the episode's place in a serial (Micro Drama) or the next number of the series, and never changes once an episode is made |
 | `seriesDisplayTitle` | string | no | The series title numbered episodes carry. Empty uses a serial's own story title, then the series name |
 | `episodeTitleSeparator` | `hyphen` \| `em_dash` \| `pipe` \| `colon` | no | What joins the series title and the episode number: hyphen ("Title - Episode 1", the default), em_dash, pipe ("Title | Episode 1") or colon ("Title: Episode 1") |
@@ -1255,7 +1377,7 @@ Body fields:
 | --- | --- | --- | --- |
 | `videoId` | string | yes | The video (project) to publish |
 | `platform` | `youtube` \| `tiktok` \| `instagram` \| `x` \| `facebook` \| `linkedin` \| `threads` | yes | Destination platform; must be connected (see GET /accounts) |
-| `title` | string | no | Post title or caption (platform-appropriate); falls back to the video's stored post metadata |
+| `title` | string | no | Post title or caption (platform-appropriate), posted as written; falls back to the video's stored caption for that platform (faceless_set_video_captions), else its stored post metadata |
 | `description` | string | no | Longer description for platforms that support one (YouTube, Facebook, LinkedIn) |
 | `privacyStatus` | `public` \| `unlisted` \| `private` | no | YouTube only; defaults to public |
 | `madeForKids` | boolean | no | YouTube only: declare the video made for kids (COPPA). Omitted: the video's stored choice, else on for kids formats, else not sent |
@@ -1290,7 +1412,7 @@ Response:
 
 `POST /posts/schedule`
 
-Schedules a video to be rendered (if needed) and posted to multiple platforms at a future time. Every platform in the list must have its post metadata already set on the video (PATCH /videos/{id}); the request is rejected otherwise. Cancel with DELETE /posts/{videoId}. See the posting calendar with GET /calendar.
+Schedules a video to be rendered (if needed) and posted to multiple platforms at a future time. Every platform in the list must have its caption set on the video (PATCH /videos/{id}/captions or PATCH /videos/{id}), or given here in captions; the request is rejected otherwise. Captions given here are stored first and posted exactly as written. Cancel with DELETE /posts/{videoId}. See the posting calendar with GET /calendar.
 
 - Scopes: `posts:write`
 - Credits: none
@@ -1304,8 +1426,9 @@ Body fields:
 | Name | Type | Required | Description |
 | --- | --- | --- | --- |
 | `videoId` | string | yes | The video (project) to schedule |
-| `platforms` | array | yes | Platforms to post to; each needs its post metadata set on the video first |
+| `platforms` | array | yes | Platforms to post to; each needs its caption or post metadata set on the video first, or given in captions |
 | `scheduledTime` | string | yes | When to post (ISO 8601, future) |
+| `captions` | object | no | Set each platform's caption in the same call, as faceless_set_video_captions does. Each platform's caption, exactly as it should post: the whole text with its hashtags, written to your own rules. Faceless never rewrites it: no AI, no hashtags added, no series caption rules. Only platform policy still applies: a product ad's TikTok caption loses off-platform shop links and prices (the answer says so), Instagram's 30-hashtag and 20-mention limits are checked, and a paid Earn sponsor block (#ad) the post carries stays at the top. Platforms left out keep what they have |
 
 Example:
 

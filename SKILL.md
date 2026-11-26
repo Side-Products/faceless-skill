@@ -51,6 +51,8 @@ If npm is unavailable, fall back to the raw HTTP API (see the last section).
 | `faceless videos list` | List the team's videos | GET /videos |
 | `faceless videos get` | Get one video | GET /videos/{id} |
 | `faceless videos update` | Update a video's name or post metadata | PATCH /videos/{id} |
+| `faceless videos get-captions` | Read what each platform posts for a video | GET /videos/{id}/captions |
+| `faceless videos set-captions` | Set each platform's caption for a video, posted exactly as written | PATCH /videos/{id}/captions |
 | `faceless videos select-thumbnail` | Choose which thumbnail a video uses | POST /videos/{id}/thumbnail |
 | `faceless videos status` | Poll video generation progress | GET /videos/{id}/status |
 | `faceless videos render` | Render a video to MP4 | POST /videos/{id}/render |
