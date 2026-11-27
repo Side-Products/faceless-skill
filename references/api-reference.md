@@ -904,7 +904,7 @@ Response:
 
 `GET /videos/{id}/shots`
 
-Lists the pictures and clips the video pipeline made for a video that has finished generating (a narrated video or an Audio to Visuals video made from your own recording), in timeline order, numbered as the editor numbers them: each shot's number, itemId, start and end seconds, the line spoken over it, whether it can be redone with faceless_redo_shot and its redo price in credits, and the status of its latest redo (idle, processing, done or failed, with refunded when a failed redo gave its credits back). Use it to find the shot to replace, and after faceless_redo_shot to see when the new one is in. Free.
+Lists the pictures and clips the video pipeline made for a video that has finished generating (a narrated video or an Audio to Visuals video made from your own recording), in timeline order, numbered as the editor numbers them: each shot's number, itemId, start and end seconds, the line spoken over it, whether it can be redone with faceless_redo_shot and its redo price in credits, and the status of its latest redo (idle, processing, done or failed, with refunded when a failed redo gave its credits back). Use it to find the shot to replace, and after faceless_redo_shot to see when the new one is in. Also returns the video's current cover (cover.url, the thumbnail it posts with, and who chose it); faceless_set_cover changes it. Free.
 
 - Scopes: `videos:read`
 - Credits: none
@@ -927,6 +927,11 @@ Response:
     "id": "665f1b2a9c31a2b3c4d5e801",
     "platform": "audio-to-visuals",
     "renderNeeded": false,
+    "cover": {
+      "url": "https://faceless-so.s3.amazonaws.com/thumbnails/665f1b2a9c31a2b3c4d5e801/0/user-frame-1764240000000.jpg",
+      "selectedBy": "user",
+      "source": "frame"
+    },
     "shots": [
       {
         "shot": 1,
@@ -1075,6 +1080,51 @@ Response:
     },
     "renderNeeded": true,
     "message": "Cleaned. Every cut, caption and picture stays where it was. Call POST /videos/{id}/render (faceless_render_video) for the new MP4."
+  }
+}
+```
+
+### Set a video's cover (thumbnail)
+
+`POST /videos/{id}/cover`
+
+Sets the cover a finished video posts with (its thumbnail: what YouTube, Instagram and Facebook show), from exactly one of: frameAt, a time in seconds on the video, for that frame of its current render at full resolution (free; a video with no render, or one changed since its last render, answers 409: POST /videos/{id}/render (faceless_render_video) first); imageUrl, a public https link to your own picture (JPG, PNG or WebP; Google Drive and Dropbox share links work), copied to Faceless and made a JPEG under 2 MB (free); or generate, a new picture Faceless draws for the cover, following the video's art direction, its never-show list and your team's picture rule (faceless_update_video_defaults pictureRule), checked against them like a redone shot, with generate.note saying what it should show (up to 300 characters) and generate.headline the words on it (left out: Faceless writes a short headline; "" for none; a picture rule that bans text gets none). generate costs 2 credits, the price of a picture redo, refunded when it fails, and answers when the picture is ready, usually within a minute. The new cover is marked as your pick, so automatic thumbnails never replace it; no new render is needed. The earlier covers stay in the video's thumbnail list (GET /videos/{id}) and faceless_select_video_thumbnail picks one again. faceless_list_shots shows the current cover. A posting approval covers the cover: a video that waits for approval needs approving again after it changes.
+
+- Scopes: `videos:write`
+- Credits: none for frameAt or imageUrl; generate costs 2 credits (the price of a picture redo), refunded when it fails
+- Rate limit: 20 per 300s
+- Supports `Idempotency-Key` header
+- CLI: `faceless videos set-cover`
+- MCP tool: `faceless_set_cover`
+
+Body fields:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `frameAt` | number | no | A time on the video in seconds: that frame of its current render becomes the cover. Free |
+| `imageUrl` | string | no | A public https link to your own picture (JPG, PNG or WebP, up to 15 MB): it becomes the cover. Free |
+| `generate` | object | no | A new cover picture drawn by Faceless with your picture rule. 2 credits, refunded when it fails |
+
+Example:
+
+```bash
+curl -s -X POST "https://faceless.so/api/v1/videos/<id>/cover" \
+  -H "Authorization: Bearer $FACELESS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"frameAt":3.5}'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "665f1b2a9c31a2b3c4d5e801",
+    "thumbnailUrl": "https://faceless-so.s3.amazonaws.com/thumbnails/665f1b2a9c31a2b3c4d5e801/0/user-frame-1764240000000.jpg",
+    "source": "frame",
+    "credits": 0,
+    "message": "Done: the cover is now that frame of the video. It is marked as your pick, so automatic thumbnails never replace it, and YouTube, Instagram and Facebook get it when the video posts. No new render is needed."
   }
 }
 ```
