@@ -57,6 +57,9 @@ If npm is unavailable, fall back to the raw HTTP API (see the last section).
 | `faceless videos status` | Poll video generation progress | GET /videos/{id}/status |
 | `faceless videos render` | Render a video to MP4 | POST /videos/{id}/render |
 | `faceless videos place-images` | Place your own pictures in a video | POST /videos/{id}/images |
+| `faceless videos shots` | List a video's shots | GET /videos/{id}/shots |
+| `faceless videos redo-shot` | Redo one shot of a video | POST /videos/{id}/shots |
+| `faceless videos clean-audio` | Clean the recorded voice of an Audio to Visuals video again | POST /videos/{id}/clean-audio |
 | `faceless videos delete` | Delete a video | DELETE /videos/{id} |
 | `faceless renders get` | Poll render progress | GET /renders/{id} |
 | `faceless series create` | Create an automated video series | POST /series |

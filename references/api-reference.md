@@ -900,6 +900,185 @@ Response:
 }
 ```
 
+### List a video's shots
+
+`GET /videos/{id}/shots`
+
+Lists the pictures and clips the video pipeline made for a video that has finished generating (a narrated video or an Audio to Visuals video made from your own recording), in timeline order, numbered as the editor numbers them: each shot's number, itemId, start and end seconds, the line spoken over it, whether it can be redone with faceless_redo_shot and its redo price in credits, and the status of its latest redo (idle, processing, done or failed, with refunded when a failed redo gave its credits back). Use it to find the shot to replace, and after faceless_redo_shot to see when the new one is in. Free.
+
+- Scopes: `videos:read`
+- Credits: none
+- CLI: `faceless videos shots`
+- MCP tool: `faceless_list_shots`
+
+Example:
+
+```bash
+curl -s "https://faceless.so/api/v1/videos/<id>/shots" \
+  -H "Authorization: Bearer $FACELESS_API_KEY"
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "665f1b2a9c31a2b3c4d5e801",
+    "platform": "audio-to-visuals",
+    "renderNeeded": false,
+    "shots": [
+      {
+        "shot": 1,
+        "itemId": "hNNM",
+        "type": "video",
+        "startSeconds": 0,
+        "endSeconds": 2.27,
+        "line": "Worried about what's coming next?",
+        "redo": {
+          "supported": true,
+          "kind": "image",
+          "credits": 2,
+          "stillFromClip": true
+        },
+        "redoStatus": {
+          "status": "idle"
+        }
+      },
+      {
+        "shot": 2,
+        "itemId": "r4mz",
+        "type": "image",
+        "startSeconds": 2.27,
+        "endSeconds": 5.3,
+        "line": "Ask for this, and listen to the last line.",
+        "redo": {
+          "supported": true,
+          "kind": "image",
+          "credits": 2
+        },
+        "redoStatus": {
+          "status": "done",
+          "error": null,
+          "credits": 2,
+          "refunded": false,
+          "redraw": false,
+          "updatedAt": "2026-11-27T10:00:00.000Z"
+        }
+      }
+    ]
+  }
+}
+```
+
+### Redo one shot of a video
+
+`POST /videos/{id}/shots`
+
+Makes ONE picture or clip of a finished video again and swaps it in at the same place and timing, the editor's "Redo this shot": the same generator and the video's art direction, your team's picture rule (faceless_update_video_defaults pictureRule) and the video's never-show list, checked like the first take. Name the shot by shot (its number in faceless_list_shots), at (a time in seconds on the video) or itemId, and say what to change in note ("show a man from behind instead of a woman"; the note wins over the old picture's description). matchShot (a shot number) draws it to match the look of that shot; redraw: true redraws a Motion clip's opening picture first. Costs the editor's redo price, shown per shot by faceless_list_shots: 2 credits for a picture (a Storyboard still; a Storyboard animated clip comes back as a still) or a Stock Footage clip, a Motion clip its billed seconds (4 to 15) at its tier's per-second rate (+2 with redraw). A redo that fails gives its credits back. It takes a minute or two (a Motion clip up to ten): poll faceless_list_shots until the shot's redoStatus is done, then POST /videos/{id}/render (faceless_render_video) for the new MP4.
+
+- Scopes: `videos:write`
+- Credits: the editor's redo price: 2 credits for a picture or a Stock Footage clip; a Motion clip its billed seconds (4 to 15) at its tier's per-second rate (+2 to redraw its opening picture). Refunded when the redo fails
+- Rate limit: 20 per 300s
+- CLI: `faceless videos redo-shot`
+- MCP tool: `faceless_redo_shot`
+
+Body fields:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `shot` | integer | no | The shot's number in faceless_list_shots (1 is the first) |
+| `at` | number | no | A time on the video, in seconds: the shot on screen then |
+| `itemId` | string | no | The shot's itemId from faceless_list_shots |
+| `note` | string | no | What to change in the new picture, up to 300 characters. Left out: drawn again from the same description |
+| `matchShot` | integer | no | Draw it to match the look of this shot (its number in faceless_list_shots), at the normal price |
+| `redraw` | boolean | no | Motion clips only: redraw the clip's opening picture first (+2 credits) |
+
+Example:
+
+```bash
+curl -s -X POST "https://faceless.so/api/v1/videos/<id>/shots" \
+  -H "Authorization: Bearer $FACELESS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"shot":1,"note":"A man seen from behind at a window at dusk, head bowed; no woman, no face."}'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "665f1b2a9c31a2b3c4d5e801",
+    "shot": 1,
+    "itemId": "hNNM",
+    "status": "processing",
+    "kind": "image",
+    "credits": 2,
+    "message": "Redoing. Poll GET /videos/{id}/shots (faceless_list_shots) until this shot's redoStatus is done (a failure refunds the credits), then POST /videos/{id}/render (faceless_render_video) for the new MP4."
+  }
+}
+```
+
+### Clean the recorded voice of an Audio to Visuals video again
+
+`POST /videos/{id}/clean-audio`
+
+Runs the own-voice cleanup again on a video made from your own recording (faceless_create_video_from_audio or the Audio to Visuals tool): the background noise, judged by how loud it sounds once the voice is levelled for playback and taken down where it can be heard, and the breaths, lip smacks, clicks and swallows between the words, lowered toward the room's own quiet. Nothing inside a word is touched, and every cut, caption and picture stays exactly where it is on the timeline. strength strong takes the noise and the mouth sounds down further, for a recording that still sounds noisy. The video's MP4 is then out of date: POST /videos/{id}/render (faceless_render_video) for the new one. Returns the noise measured before and after and what was lowered. Free.
+
+- Scopes: `videos:write`
+- Credits: none
+- Rate limit: 10 per 300s
+- CLI: `faceless videos clean-audio`
+- MCP tool: `faceless_clean_audio`
+
+Body fields:
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `strength` | `normal` \| `strong` | no | normal (the cleanup new videos get) or strong (further, for noise you can still hear) |
+
+Example:
+
+```bash
+curl -s -X POST "https://faceless.so/api/v1/videos/<id>/clean-audio" \
+  -H "Authorization: Bearer $FACELESS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"strength":"normal"}'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "665f1b2a9c31a2b3c4d5e801",
+    "changed": true,
+    "audioUrl": "https://faceless-tts-generated-voices.s3.amazonaws.com/own-voice/6ad52776d72a17c4b3912002/0e6fcebb.clean.mp3",
+    "seconds": 51.1,
+    "strength": "normal",
+    "noise": {
+      "floorDb": -63.1,
+      "speechDb": -20.9,
+      "loudnessLufs": -20,
+      "heardFloorDb": -57.1,
+      "denoise": true,
+      "nr": 12,
+      "afterFloorDb": -68.4
+    },
+    "mouth": {
+      "lowered": true,
+      "breaths": 13,
+      "clicks": 18,
+      "swallows": 2
+    },
+    "renderNeeded": true,
+    "message": "Cleaned. Every cut, caption and picture stays where it was. Call POST /videos/{id}/render (faceless_render_video) for the new MP4."
+  }
+}
+```
+
 ### Delete a video
 
 `DELETE /videos/{id}`
